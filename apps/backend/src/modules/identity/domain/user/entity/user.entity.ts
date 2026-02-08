@@ -64,6 +64,10 @@ export class User {
     return this.props.email;
   }
 
+  get passwordHash(): PasswordHash {
+    return this.props.passwordHash;
+  }
+
   get displayName(): string {
     return this.props.displayName;
   }

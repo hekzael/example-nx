@@ -39,17 +39,22 @@ export class Role {
   }
 
   get permissions(): PermissionId[] {
-    return [...this.props.permissions!];
+    return [...(this.props.permissions || [])];
   }
 
   assignPermission(permissionId: PermissionId): void {
-    const exists = this.props.permissions!.some((assigned) => assigned.equals(permissionId));
+    const exists = this.permissions.some((assigned) =>
+      assigned.equals(permissionId),
+    );
 
     if (exists) {
-      throw new DomainException('DUPLICATE_ROLE_PERMISSION', 'Permiso ya asignado al rol.');
+      throw new DomainException(
+        'DUPLICATE_ROLE_PERMISSION',
+        'Permiso ya asignado al rol.',
+      );
     }
 
-    this.props.permissions!.push(permissionId);
+    this.permissions.push(permissionId);
 
     this.addEvent(
       new PermissionAssignedEvent(
@@ -64,14 +69,17 @@ export class Role {
   }
 
   revokePermission(permissionId: PermissionId): void {
-    const initialLength = this.props.permissions!.length;
+    const initialLength = this.permissions.length;
 
-    this.props.permissions = this.props.permissions!.filter(
+    this.props.permissions = this.permissions.filter(
       (assigned) => !assigned.equals(permissionId),
     );
 
-    if (this.props.permissions!.length === initialLength) {
-      throw new DomainException('ROLE_PERMISSION_NOT_FOUND', 'Permiso no asignado al rol.');
+    if (this.permissions.length === initialLength) {
+      throw new DomainException(
+        'ROLE_PERMISSION_NOT_FOUND',
+        'Permiso no asignado al rol.',
+      );
     }
 
     this.addEvent(

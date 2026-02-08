@@ -6,11 +6,11 @@ Objetivo: estructura monolito modular con limites por contexto y lista para extr
 
 - `apps/backend/`
 - `apps/backend/src/`
-- `apps/backend/src/main/`
+- `apps/backend/src/app/`
 - `apps/backend/src/modules/`
 - `apps/backend/src/shared/`
 
-## Módulos (bounded contexts)
+## Mï¿½dulos (bounded contexts)
 
 Cada modulo es autocontenido y puede extraerse a microservicio:
 
@@ -24,14 +24,14 @@ Cada modulo es autocontenido y puede extraerse a microservicio:
 - `domain/`
 - `application/`
 - `infrastructure/`
-- `http/`
+- `infrastructure/http/`
 
 Ejemplo:
 
 - `apps/backend/src/modules/identity/domain/`
 - `apps/backend/src/modules/identity/application/`
 - `apps/backend/src/modules/identity/infrastructure/`
-- `apps/backend/src/modules/identity/http/`
+- `apps/backend/src/modules/identity/infrastructure/http/`
 
 ## Shared Kernel
 
@@ -42,8 +42,8 @@ Ejemplo:
 
 ## Reglas para extraer microservicios
 
-- No imports directos entre módulos. Comunicar via eventos o puertos.
-- Un modulo solo conoce interfaces externas, no implementaciones de otros módulos.
+- No imports directos entre mï¿½dulos. Comunicar via eventos o puertos.
+- Un modulo solo conoce interfaces externas, no implementaciones de otros mï¿½dulos.
 - Infraestructura de cada modulo vive dentro del modulo.
 - Configuracion/bootstrapping en `src/main`.
 
@@ -56,8 +56,3 @@ Ejemplo:
 ## Mapa de eventos
 
 Ver docs/operations.md (Event Map).
-
-
-
-
-

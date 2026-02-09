@@ -26,12 +26,78 @@ export class InitialSchema1770619532794 implements MigrationInterface {
         "display_name" text NOT NULL CHECK (length("display_name") <= 255),
         "password_hash" text NOT NULL CHECK (length("password_hash") <= 255),
         "is_active" boolean NOT NULL DEFAULT true,
+        "email_verified_at" timestamptz,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now(),
         "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
         "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL
       )
     `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."email_verification_token" (
+        "email_verification_token_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "user_id" uuid NOT NULL REFERENCES "identity"."user"("user_id") ON DELETE CASCADE,
+        "token_hash" text NOT NULL CHECK (length("token_hash") <= 255),
+        "expires_at" timestamptz NOT NULL,
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        UNIQUE ("token_hash")
+      )
+    `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."password_reset_token" (
+        "password_reset_token_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "user_id" uuid NOT NULL REFERENCES "identity"."user"("user_id") ON DELETE CASCADE,
+        "token_hash" text NOT NULL CHECK (length("token_hash") <= 255),
+        "expires_at" timestamptz NOT NULL,
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        UNIQUE ("token_hash")
+      )
+    `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."refresh_token" (
+        "refresh_token_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "user_id" uuid NOT NULL REFERENCES "identity"."user"("user_id") ON DELETE CASCADE,
+        "token_hash" text NOT NULL CHECK (length("token_hash") <= 255),
+        "expires_at" timestamptz NOT NULL,
+        "revoked_at" timestamptz,
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        UNIQUE ("token_hash")
+      )
+    `);
+
+    await queryRunner.query(
+      'CREATE INDEX "idx_email_verification_token_user_id" ON "identity"."email_verification_token" ("user_id")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_email_verification_token_expires_at" ON "identity"."email_verification_token" ("expires_at")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_password_reset_token_user_id" ON "identity"."password_reset_token" ("user_id")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_password_reset_token_expires_at" ON "identity"."password_reset_token" ("expires_at")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_refresh_token_user_id" ON "identity"."refresh_token" ("user_id")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_refresh_token_expires_at" ON "identity"."refresh_token" ("expires_at")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_refresh_token_revoked_at" ON "identity"."refresh_token" ("revoked_at")',
+    );
 
     await queryRunner.query(`
       CREATE TABLE "projects"."project" (
@@ -244,35 +310,105 @@ export class InitialSchema1770619532794 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP INDEX IF EXISTS "audit"."idx_audit_log_actor_user_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "audit"."idx_audit_log_created_at"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_role_permission_project_permission_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_permission_project_environment_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_permission_project_module_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_permission_project"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_user_project_role_project_role_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_user_project_role_project_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_user_project_role_user"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_role_project_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_team_module_project_module_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_team_project_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_module_project_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_project_environment_project_id"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_team_member_user"');
-    await queryRunner.query('DROP INDEX IF EXISTS "projects"."idx_team_member_team"');
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "audit"."idx_audit_log_actor_user_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "audit"."idx_audit_log_created_at"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_password_reset_token_expires_at"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_password_reset_token_user_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_refresh_token_revoked_at"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_refresh_token_expires_at"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_refresh_token_user_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_email_verification_token_expires_at"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_email_verification_token_user_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_role_permission_project_permission_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_permission_project_environment_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_permission_project_module_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_permission_project"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_user_project_role_project_role_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_user_project_role_project_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_user_project_role_user"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_role_project_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_team_module_project_module_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_team_project_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_module_project_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_project_environment_project_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_team_member_user"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "projects"."idx_team_member_team"',
+    );
 
     await queryRunner.query('DROP TABLE IF EXISTS "audit"."audit_log"');
-    await queryRunner.query('DROP TABLE IF EXISTS "projects"."user_project_role"');
-    await queryRunner.query('DROP TABLE IF EXISTS "projects"."project_role_permission"');
-    await queryRunner.query('DROP TABLE IF EXISTS "projects"."project_permission"');
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "projects"."user_project_role"',
+    );
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "projects"."project_role_permission"',
+    );
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "projects"."project_permission"',
+    );
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."project_role"');
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."team_member"');
-    await queryRunner.query('DROP TYPE IF EXISTS "projects"."team_member_role"');
+    await queryRunner.query(
+      'DROP TYPE IF EXISTS "projects"."team_member_role"',
+    );
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."team_module"');
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."team"');
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."project_module"');
-    await queryRunner.query('DROP TABLE IF EXISTS "projects"."project_environment"');
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "projects"."project_environment"',
+    );
     await queryRunner.query('DROP TABLE IF EXISTS "projects"."project"');
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "identity"."password_reset_token"',
+    );
+    await queryRunner.query('DROP TABLE IF EXISTS "identity"."refresh_token"');
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "identity"."email_verification_token"',
+    );
     await queryRunner.query('DROP TABLE IF EXISTS "identity"."user"');
 
     await queryRunner.query('DROP SCHEMA IF EXISTS "audit"');

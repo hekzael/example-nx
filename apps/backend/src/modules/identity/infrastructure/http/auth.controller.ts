@@ -19,6 +19,7 @@ import { LoginHttpDto } from '@identity/infrastructure/http/dtos/login.http-dto'
 import { RefreshSessionHttpDto } from '@identity/infrastructure/http/dtos/refresh-session.http-dto';
 import { LogoutHttpDto } from '@identity/infrastructure/http/dtos/logout.http-dto';
 import { AuthTokensResponseDto } from '@identity/infrastructure/http/dtos/auth-tokens.response-dto';
+import { Public } from '@shared/http/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -32,6 +33,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @Public()
   async login(
     @Body() body: LoginHttpDto,
   ): Promise<AuthTokensResponseDto> {
@@ -44,6 +46,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Public()
   async refresh(
     @Body() body: RefreshSessionHttpDto,
   ): Promise<AuthTokensResponseDto> {
@@ -56,12 +59,14 @@ export class AuthController {
   }
 
   @Post('logout')
+  @Public()
   @HttpCode(204)
   async logout(@Body() body: LogoutHttpDto): Promise<void> {
     await this.logoutUseCase.execute(new LogoutCommand(body.refreshToken));
   }
 
   @Post('forgot-password')
+  @Public()
   @HttpCode(204)
   async requestPasswordReset(
     @Body() body: RequestPasswordResetHttpDto,
@@ -72,6 +77,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @Public()
   async resetPassword(
     @Body() body: ResetPasswordHttpDto,
   ): Promise<{ userId: string }> {
@@ -82,6 +88,7 @@ export class AuthController {
   }
 
   @Post('verify-email')
+  @Public()
   async verifyEmail(
     @Body() body: VerifyEmailHttpDto,
   ): Promise<{ userId: string }> {

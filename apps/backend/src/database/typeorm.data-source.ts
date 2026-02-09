@@ -9,6 +9,6 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'magic_tool',
   entities: [],
-  migrations: ['apps/backend/src/main/database/migrations/*.ts'],
+  migrations: ['apps/backend/src/database/migrations/*.ts'],
   synchronize: false,
 });

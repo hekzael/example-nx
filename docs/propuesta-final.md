@@ -1000,6 +1000,31 @@ Nombres:
 - **Avoid ambiguous abbreviations**.
 - **Avoid generic suffixes without context** (e.g., `Manager`, `Helper`).
 
+- Database Naming
+
+ Notes                              | Example Correct            | Example Wrong            |
+ ---------------------------------- | -------------------------- | ------------------------ |
+ Tables use singular `snake_case`.  | `user`, `order_item`       | `users`, `order_items`   |
+ Columns use `snake_case`.          | `created_at`, `updated_at` | `createdAt`, `CreatedAt` |
+ PK is `id`; FK is `<singular>_id`. | `id`, `user_id`            | `userId`, `userID`       |
+
+- Database Schemas (por bounded context)
+
+  - `identity`: identidad y acceso.
+  - `projects`: proyectos, módulos, entornos, equipos y roles.
+  - `operations`: solicitudes, aprobaciones y ejecuciones.
+  - `audit`: auditoría.
+
+  Ejemplos:
+
+  - `identity.user`
+  - `projects.project`
+  - `projects.project_module`
+  - `projects.project_environment`
+  - `projects.team`
+  - `projects.project_role`
+  - `audit.audit_log`
+
 Documentacion:
 
 - Este documento es el indice maestro.

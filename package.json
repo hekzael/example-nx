@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "typeorm": "typeorm-ts-node-commonjs -d apps/backend/src/main/database/typeorm.data-source.ts",
+    "typeorm": "typeorm-ts-node-commonjs -d apps/backend/src/database/typeorm.data-source.ts",
     "typeorm:migration:generate": "npm run typeorm -- migration:generate",
     "typeorm:migration:run": "npm run typeorm -- migration:run",
     "typeorm:migration:revert": "npm run typeorm -- migration:revert"

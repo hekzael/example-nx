@@ -1,10 +1,10 @@
-import { InvalidTokenException } from '../../../domain/user/errors/invalid-token.exception';
-import { UserNotFoundException } from '../../../domain/user/errors/user-not-found.exception';
-import { UserId } from '../../../domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { VerifyEmailCommand } from '../command/verify-email.command';
-import { VerifyEmailPort } from '../port/verify-email.port';
-import { EmailVerificationTokenPort } from '../../shared/port/email-verification-token.port';
+import { InvalidTokenException } from '@identity/domain/user/errors/invalid-token.exception';
+import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { VerifyEmailCommand } from '@identity/application/verify-email/command/verify-email.command';
+import { VerifyEmailPort } from '@identity/application/verify-email/port/verify-email.port';
+import { EmailVerificationTokenPort } from '@identity/application/shared/port/email-verification-token.port';
 
 export class VerifyEmailUseCase implements VerifyEmailPort {
   constructor(

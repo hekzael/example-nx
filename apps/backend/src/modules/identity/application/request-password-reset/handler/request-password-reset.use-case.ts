@@ -1,8 +1,8 @@
-import { Email } from '../../../domain/user/value-objects/email.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { RequestPasswordResetCommand } from '../command/request-password-reset.command';
-import { RequestPasswordResetPort } from '../port/request-password-reset.port';
-import { PasswordResetTokenPort } from '../../shared/port/password-reset-token.port';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { RequestPasswordResetCommand } from '@identity/application/request-password-reset/command/request-password-reset.command';
+import { RequestPasswordResetPort } from '@identity/application/request-password-reset/port/request-password-reset.port';
+import { PasswordResetTokenPort } from '@identity/application/shared/port/password-reset-token.port';
 
 export class RequestPasswordResetUseCase implements RequestPasswordResetPort {
   constructor(

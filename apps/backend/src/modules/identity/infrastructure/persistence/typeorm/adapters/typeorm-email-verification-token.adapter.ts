@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import { MoreThan, Repository } from 'typeorm';
-import { EmailVerificationTokenPort } from '../../../../application/shared/port/email-verification-token.port';
-import { EmailVerificationTokenOrmEntity } from '../entities/email-verification-token.orm-entity';
+import { EmailVerificationTokenPort } from '@identity/application/shared/port/email-verification-token.port';
+import { EmailVerificationTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 
 export class TypeOrmEmailVerificationTokenAdapter
   implements EmailVerificationTokenPort

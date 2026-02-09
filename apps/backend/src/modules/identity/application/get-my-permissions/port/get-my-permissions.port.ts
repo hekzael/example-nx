@@ -1,4 +1,4 @@
-import { GetMyPermissionsQuery } from '../command/get-my-permissions.query';
+import { GetMyPermissionsQuery } from '@identity/application/get-my-permissions/command/get-my-permissions.query';
 
 export interface GetMyPermissionsPort {
   execute(command: GetMyPermissionsQuery): Promise<

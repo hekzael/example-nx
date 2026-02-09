@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { MyPermissionItemResponseDto } from './my-permission-item.response-dto';
+import { MyPermissionItemResponseDto } from '@identity/infrastructure/http/dtos/my-permission-item.response-dto';
 
 export class MyPermissionsResponseDto {
   @Expose()

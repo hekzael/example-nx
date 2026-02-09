@@ -1,6 +1,6 @@
-import { GetMyRolesQuery } from '../command/get-my-roles.query';
-import { GetMyRolesPort } from '../port/get-my-roles.port';
-import { CurrentUserReadPort } from '../../shared/port/current-user-read.port';
+import { GetMyRolesQuery } from '@identity/application/get-my-roles/command/get-my-roles.query';
+import { GetMyRolesPort } from '@identity/application/get-my-roles/port/get-my-roles.port';
+import { CurrentUserReadPort } from '@identity/application/shared/port/current-user-read.port';
 
 export class GetMyRolesUseCase implements GetMyRolesPort {
   constructor(private readonly currentUserReadPort: CurrentUserReadPort) {}

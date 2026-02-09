@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { TokenSigningPort } from '../../../application/shared/port/token-signing.port';
+import { TokenSigningPort } from '@identity/application/shared/port/token-signing.port';
 
 export class JwtTokenSigningAdapter implements TokenSigningPort {
   constructor(private readonly jwtService: JwtService) {}

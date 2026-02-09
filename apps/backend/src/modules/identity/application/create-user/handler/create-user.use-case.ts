@@ -1,15 +1,15 @@
-import { User } from '../../../domain/user/entity/user.entity';
-import { UserAlreadyExistsException } from '../../../domain/user/errors/user-already-exists.exception';
-import { DisplayName } from '../../../domain/user/value-objects/display-name.vo';
-import { Email } from '../../../domain/user/value-objects/email.vo';
-import { PasswordHash } from '../../../domain/user/value-objects/password-hash.vo';
-import { UserId } from '../../../domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { CreateUserCommand } from '../command/create-user.command';
-import { CreateUserPort } from '../port/create-user.port';
-import { PasswordPolicyService } from '../../shared/password-policy/password-policy.service';
-import { PasswordHashingPort } from '../../shared/port/password-hashing.port';
-import { UserIdGeneratorPort } from '../../shared/port/user-id-generator.port';
+import { User } from '@identity/domain/user/entity/user.entity';
+import { UserAlreadyExistsException } from '@identity/domain/user/errors/user-already-exists.exception';
+import { DisplayName } from '@identity/domain/user/value-objects/display-name.vo';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { CreateUserCommand } from '@identity/application/create-user/command/create-user.command';
+import { CreateUserPort } from '@identity/application/create-user/port/create-user.port';
+import { PasswordPolicyService } from '@identity/application/shared/password-policy/password-policy.service';
+import { PasswordHashingPort } from '@identity/application/shared/port/password-hashing.port';
+import { UserIdGeneratorPort } from '@identity/application/shared/port/user-id-generator.port';
 
 export class CreateUserUseCase implements CreateUserPort {
   constructor(

@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import { Repository } from 'typeorm';
-import { RefreshTokenPort } from '../../../../application/shared/port/refresh-token.port';
-import { RefreshTokenOrmEntity } from '../entities/refresh-token.orm-entity';
+import { RefreshTokenPort } from '@identity/application/shared/port/refresh-token.port';
+import { RefreshTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
 
 export class TypeOrmRefreshTokenAdapter implements RefreshTokenPort {
   private static readonly TOKEN_BYTES = 32;

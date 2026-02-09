@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { CurrentUserReadPort } from '../../../../application/shared/port/current-user-read.port';
+import { CurrentUserReadPort } from '@identity/application/shared/port/current-user-read.port';
 
 export class TypeOrmCurrentUserReadAdapter implements CurrentUserReadPort {
   constructor(private readonly dataSource: DataSource) {}

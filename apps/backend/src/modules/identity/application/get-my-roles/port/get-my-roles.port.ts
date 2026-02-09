@@ -1,4 +1,4 @@
-import { GetMyRolesQuery } from '../command/get-my-roles.query';
+import { GetMyRolesQuery } from '@identity/application/get-my-roles/command/get-my-roles.query';
 
 export interface GetMyRolesPort {
   execute(command: GetMyRolesQuery): Promise<

@@ -4,6 +4,15 @@
     "outDir": "dist",
     "types": ["node"],
     "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@identity/*": ["src/modules/identity/*"],
+      "@projects/*": ["src/modules/projects/*"],
+      "@operations/*": ["src/modules/operations/*"],
+      "@audit/*": ["src/modules/audit/*"],
+      "@shared/*": ["src/shared/*"]
+    },
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

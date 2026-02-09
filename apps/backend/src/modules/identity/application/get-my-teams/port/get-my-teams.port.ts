@@ -1,4 +1,4 @@
-import { GetMyTeamsQuery } from '../command/get-my-teams.query';
+import { GetMyTeamsQuery } from '@identity/application/get-my-teams/command/get-my-teams.query';
 
 export interface GetMyTeamsPort {
   execute(command: GetMyTeamsQuery): Promise<

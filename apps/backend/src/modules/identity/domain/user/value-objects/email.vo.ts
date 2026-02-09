@@ -1,4 +1,4 @@
-import { EmailException } from '../errors/email.exception';
+import { EmailException } from '@identity/domain/user/errors/email.exception';
 
 export class Email {
   private static readonly EMAIL_REGEX =

@@ -1,8 +1,8 @@
-import { UserNotFoundException } from '../../../domain/user/errors/user-not-found.exception';
-import { UserId } from '../../../domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { GetUserQuery } from '../command/get-user.query';
-import { GetUserPort } from '../port/get-user.port';
+import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { GetUserQuery } from '@identity/application/get-user/command/get-user.query';
+import { GetUserPort } from '@identity/application/get-user/port/get-user.port';
 
 export class GetUserUseCase implements GetUserPort {
   constructor(private readonly userRepository: UserRepositoryPort) {}

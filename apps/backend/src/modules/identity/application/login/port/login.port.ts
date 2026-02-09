@@ -1,4 +1,4 @@
-import { LoginCommand } from '../command/login.command';
+import { LoginCommand } from '@identity/application/login/command/login.command';
 
 export interface LoginPort {
   execute(command: LoginCommand): Promise<{

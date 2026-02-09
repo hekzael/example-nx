@@ -16,6 +16,14 @@ module.exports = {
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
+  moduleNameMapper: {
+    '^@app/(.*)$': '<rootDir>/src/$1',
+    '^@identity/(.*)$': '<rootDir>/src/modules/identity/$1',
+    '^@projects/(.*)$': '<rootDir>/src/modules/projects/$1',
+    '^@operations/(.*)$': '<rootDir>/src/modules/operations/$1',
+    '^@audit/(.*)$': '<rootDir>/src/modules/audit/$1',
+    '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+  },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
 };

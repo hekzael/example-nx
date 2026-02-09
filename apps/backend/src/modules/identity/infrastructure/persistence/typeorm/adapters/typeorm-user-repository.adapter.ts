@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
-import { User } from '../../../../domain/user/entity/user.entity';
-import { DisplayName } from '../../../../domain/user/value-objects/display-name.vo';
-import { Email } from '../../../../domain/user/value-objects/email.vo';
-import { PasswordHash } from '../../../../domain/user/value-objects/password-hash.vo';
-import { UserId } from '../../../../domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '../../../../domain/user/repository/user-repository.port';
-import { UserOrmEntity } from '../entities/user.orm-entity';
+import { User } from '@identity/domain/user/entity/user.entity';
+import { DisplayName } from '@identity/domain/user/value-objects/display-name.vo';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { UserOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/user.orm-entity';
 
 export class TypeOrmUserRepositoryAdapter implements UserRepositoryPort {
   constructor(private readonly userRepository: Repository<UserOrmEntity>) {}

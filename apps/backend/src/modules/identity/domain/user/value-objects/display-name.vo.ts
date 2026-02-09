@@ -1,4 +1,4 @@
-import { DisplayNameException } from '../errors/display-name.exception';
+import { DisplayNameException } from '@identity/domain/user/errors/display-name.exception';
 
 export class DisplayName {
   constructor(readonly value: string) {

@@ -1,6 +1,6 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
-import { PasswordHashingPort } from '../../../application/shared/port/password-hashing.port';
+import { PasswordHashingPort } from '@identity/application/shared/port/password-hashing.port';
 
 const scrypt = promisify(scryptCallback);
 

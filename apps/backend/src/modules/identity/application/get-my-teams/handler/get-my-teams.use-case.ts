@@ -1,6 +1,6 @@
-import { GetMyTeamsQuery } from '../command/get-my-teams.query';
-import { GetMyTeamsPort } from '../port/get-my-teams.port';
-import { CurrentUserReadPort } from '../../shared/port/current-user-read.port';
+import { GetMyTeamsQuery } from '@identity/application/get-my-teams/command/get-my-teams.query';
+import { GetMyTeamsPort } from '@identity/application/get-my-teams/port/get-my-teams.port';
+import { CurrentUserReadPort } from '@identity/application/shared/port/current-user-read.port';
 
 export class GetMyTeamsUseCase implements GetMyTeamsPort {
   constructor(private readonly currentUserReadPort: CurrentUserReadPort) {}

@@ -1,4 +1,4 @@
-import { RefreshSessionCommand } from '../command/refresh-session.command';
+import { RefreshSessionCommand } from '@identity/application/refresh-session/command/refresh-session.command';
 
 export interface RefreshSessionPort {
   execute(command: RefreshSessionCommand): Promise<{

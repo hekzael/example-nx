@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import { MoreThan, Repository } from 'typeorm';
-import { PasswordResetTokenPort } from '../../../../application/shared/port/password-reset-token.port';
-import { PasswordResetTokenOrmEntity } from '../entities/password-reset-token.orm-entity';
+import { PasswordResetTokenPort } from '@identity/application/shared/port/password-reset-token.port';
+import { PasswordResetTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
 
 export class TypeOrmPasswordResetTokenAdapter
   implements PasswordResetTokenPort

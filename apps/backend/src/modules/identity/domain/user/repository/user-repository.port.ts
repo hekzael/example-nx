@@ -1,6 +1,6 @@
-import { User } from '../entity/user.entity';
-import { Email } from '../value-objects/email.vo';
-import { UserId } from '../value-objects/user-id.vo';
+import { User } from '@identity/domain/user/entity/user.entity';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
 
 export interface UserRepositoryPort {
   save(user: User): Promise<void>;

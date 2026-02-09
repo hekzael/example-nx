@@ -1,4 +1,4 @@
-import { PasswordHashException } from '../errors/password-hash.exception';
+import { PasswordHashException } from '@identity/domain/user/errors/password-hash.exception';
 
 export class PasswordHash {
   constructor(readonly value: string) {

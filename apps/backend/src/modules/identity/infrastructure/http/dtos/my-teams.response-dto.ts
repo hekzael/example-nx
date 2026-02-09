@@ -1,10 +1,10 @@
 import { Expose, Type } from 'class-transformer';
-import { MyRoleItemResponseDto } from './my-role-item.response-dto';
+import { MyTeamItemResponseDto } from '@identity/infrastructure/http/dtos/my-team-item.response-dto';
 
-export class MyRolesResponseDto {
+export class MyTeamsResponseDto {
   @Expose()
-  @Type(() => MyRoleItemResponseDto)
-  readonly items!: Array<MyRoleItemResponseDto>;
+  @Type(() => MyTeamItemResponseDto)
+  readonly items!: Array<MyTeamItemResponseDto>;
 
   @Expose()
   readonly total!: number;

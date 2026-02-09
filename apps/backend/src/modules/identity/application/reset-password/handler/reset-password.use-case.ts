@@ -1,13 +1,13 @@
-import { InvalidTokenException } from '../../../domain/user/errors/invalid-token.exception';
-import { UserNotFoundException } from '../../../domain/user/errors/user-not-found.exception';
-import { PasswordHash } from '../../../domain/user/value-objects/password-hash.vo';
-import { UserId } from '../../../domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { ResetPasswordCommand } from '../command/reset-password.command';
-import { ResetPasswordPort } from '../port/reset-password.port';
-import { PasswordPolicyService } from '../../shared/password-policy/password-policy.service';
-import { PasswordHashingPort } from '../../shared/port/password-hashing.port';
-import { PasswordResetTokenPort } from '../../shared/port/password-reset-token.port';
+import { InvalidTokenException } from '@identity/domain/user/errors/invalid-token.exception';
+import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
+import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { ResetPasswordCommand } from '@identity/application/reset-password/command/reset-password.command';
+import { ResetPasswordPort } from '@identity/application/reset-password/port/reset-password.port';
+import { PasswordPolicyService } from '@identity/application/shared/password-policy/password-policy.service';
+import { PasswordHashingPort } from '@identity/application/shared/port/password-hashing.port';
+import { PasswordResetTokenPort } from '@identity/application/shared/port/password-reset-token.port';
 
 export class ResetPasswordUseCase implements ResetPasswordPort {
   constructor(

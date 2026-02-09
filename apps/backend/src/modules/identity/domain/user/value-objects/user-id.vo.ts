@@ -1,4 +1,4 @@
-import { UserIdException } from '../errors/user-id.exception';
+import { UserIdException } from '@identity/domain/user/errors/user-id.exception';
 
 export class UserId {
   private static readonly UUID_REGEX =

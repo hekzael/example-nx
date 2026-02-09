@@ -1,4 +1,4 @@
-import { CreateUserCommand } from '../command/create-user.command';
+import { CreateUserCommand } from '@identity/application/create-user/command/create-user.command';
 
 export interface CreateUserPort {
   execute(command: CreateUserCommand): Promise<string>;

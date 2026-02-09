@@ -1,4 +1,4 @@
-import { UserException } from '../../../domain/user/errors/user.exception';
+import { UserException } from '@identity/domain/user/errors/user.exception';
 
 export class PasswordPolicyService {
   private static readonly MIN_LENGTH = 12;

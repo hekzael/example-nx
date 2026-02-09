@@ -1,6 +1,6 @@
-import { LogoutCommand } from '../command/logout.command';
-import { LogoutPort } from '../port/logout.port';
-import { RefreshTokenPort } from '../../shared/port/refresh-token.port';
+import { LogoutCommand } from '@identity/application/logout/command/logout.command';
+import { LogoutPort } from '@identity/application/logout/port/logout.port';
+import { RefreshTokenPort } from '@identity/application/shared/port/refresh-token.port';
 
 export class LogoutUseCase implements LogoutPort {
   constructor(private readonly refreshTokenPort: RefreshTokenPort) {}

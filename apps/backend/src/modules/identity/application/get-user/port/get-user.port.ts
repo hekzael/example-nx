@@ -1,4 +1,4 @@
-import { GetUserQuery } from '../command/get-user.query';
+import { GetUserQuery } from '@identity/application/get-user/command/get-user.query';
 
 export interface GetUserPort {
   execute(command: GetUserQuery): Promise<{

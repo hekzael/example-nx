@@ -1,24 +1,24 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { RequestPasswordResetUseCase } from '../../application/request-password-reset/handler/request-password-reset.use-case';
-import { RequestPasswordResetCommand } from '../../application/request-password-reset/command/request-password-reset.command';
-import { ResetPasswordUseCase } from '../../application/reset-password/handler/reset-password.use-case';
-import { ResetPasswordCommand } from '../../application/reset-password/command/reset-password.command';
-import { VerifyEmailUseCase } from '../../application/verify-email/handler/verify-email.use-case';
-import { VerifyEmailCommand } from '../../application/verify-email/command/verify-email.command';
-import { LoginUseCase } from '../../application/login/handler/login.use-case';
-import { LoginCommand } from '../../application/login/command/login.command';
-import { RefreshSessionUseCase } from '../../application/refresh-session/handler/refresh-session.use-case';
-import { RefreshSessionCommand } from '../../application/refresh-session/command/refresh-session.command';
-import { LogoutUseCase } from '../../application/logout/handler/logout.use-case';
-import { LogoutCommand } from '../../application/logout/command/logout.command';
-import { RequestPasswordResetHttpDto } from './request-password-reset.http-dto';
-import { ResetPasswordHttpDto } from './reset-password.http-dto';
-import { VerifyEmailHttpDto } from './verify-email.http-dto';
-import { LoginHttpDto } from './login.http-dto';
-import { RefreshSessionHttpDto } from './refresh-session.http-dto';
-import { LogoutHttpDto } from './logout.http-dto';
-import { AuthTokensResponseDto } from './auth-tokens.response-dto';
+import { RequestPasswordResetUseCase } from '@identity/application/request-password-reset/handler/request-password-reset.use-case';
+import { RequestPasswordResetCommand } from '@identity/application/request-password-reset/command/request-password-reset.command';
+import { ResetPasswordUseCase } from '@identity/application/reset-password/handler/reset-password.use-case';
+import { ResetPasswordCommand } from '@identity/application/reset-password/command/reset-password.command';
+import { VerifyEmailUseCase } from '@identity/application/verify-email/handler/verify-email.use-case';
+import { VerifyEmailCommand } from '@identity/application/verify-email/command/verify-email.command';
+import { LoginUseCase } from '@identity/application/login/handler/login.use-case';
+import { LoginCommand } from '@identity/application/login/command/login.command';
+import { RefreshSessionUseCase } from '@identity/application/refresh-session/handler/refresh-session.use-case';
+import { RefreshSessionCommand } from '@identity/application/refresh-session/command/refresh-session.command';
+import { LogoutUseCase } from '@identity/application/logout/handler/logout.use-case';
+import { LogoutCommand } from '@identity/application/logout/command/logout.command';
+import { RequestPasswordResetHttpDto } from '@identity/infrastructure/http/dtos/request-password-reset.http-dto';
+import { ResetPasswordHttpDto } from '@identity/infrastructure/http/dtos/reset-password.http-dto';
+import { VerifyEmailHttpDto } from '@identity/infrastructure/http/dtos/verify-email.http-dto';
+import { LoginHttpDto } from '@identity/infrastructure/http/dtos/login.http-dto';
+import { RefreshSessionHttpDto } from '@identity/infrastructure/http/dtos/refresh-session.http-dto';
+import { LogoutHttpDto } from '@identity/infrastructure/http/dtos/logout.http-dto';
+import { AuthTokensResponseDto } from '@identity/infrastructure/http/dtos/auth-tokens.response-dto';
 
 @Controller('auth')
 export class AuthController {

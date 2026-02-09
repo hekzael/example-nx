@@ -3,6 +3,15 @@
   "compilerOptions": {
     "outDir": "./out-tsc/jest",
     "types": ["jest", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@identity/*": ["src/modules/identity/*"],
+      "@projects/*": ["src/modules/projects/*"],
+      "@operations/*": ["src/modules/operations/*"],
+      "@audit/*": ["src/modules/audit/*"],
+      "@shared/*": ["src/shared/*"]
+    },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

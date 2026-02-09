@@ -1,12 +1,12 @@
-import { UserNotFoundException } from '../../../domain/user/errors/user-not-found.exception';
-import { UserException } from '../../../domain/user/errors/user.exception';
-import { Email } from '../../../domain/user/value-objects/email.vo';
-import { UserRepositoryPort } from '../../../domain/user/repository/user-repository.port';
-import { LoginCommand } from '../command/login.command';
-import { LoginPort } from '../port/login.port';
-import { PasswordHashingPort } from '../../shared/port/password-hashing.port';
-import { RefreshTokenPort } from '../../shared/port/refresh-token.port';
-import { TokenSigningPort } from '../../shared/port/token-signing.port';
+import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
+import { UserException } from '@identity/domain/user/errors/user.exception';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { LoginCommand } from '@identity/application/login/command/login.command';
+import { LoginPort } from '@identity/application/login/port/login.port';
+import { PasswordHashingPort } from '@identity/application/shared/port/password-hashing.port';
+import { RefreshTokenPort } from '@identity/application/shared/port/refresh-token.port';
+import { TokenSigningPort } from '@identity/application/shared/port/token-signing.port';
 
 export class LoginUseCase implements LoginPort {
   constructor(

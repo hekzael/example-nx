@@ -1,6 +1,6 @@
-import { GetMyPermissionsQuery } from '../command/get-my-permissions.query';
-import { GetMyPermissionsPort } from '../port/get-my-permissions.port';
-import { CurrentUserReadPort } from '../../shared/port/current-user-read.port';
+import { GetMyPermissionsQuery } from '@identity/application/get-my-permissions/command/get-my-permissions.query';
+import { GetMyPermissionsPort } from '@identity/application/get-my-permissions/port/get-my-permissions.port';
+import { CurrentUserReadPort } from '@identity/application/shared/port/current-user-read.port';
 
 export class GetMyPermissionsUseCase implements GetMyPermissionsPort {
   constructor(private readonly currentUserReadPort: CurrentUserReadPort) {}

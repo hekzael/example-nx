@@ -1,11 +1,11 @@
-import { DisplayName } from '../value-objects/display-name.vo';
-import { Email } from '../value-objects/email.vo';
-import { PasswordHash } from '../value-objects/password-hash.vo';
-import { UserId } from '../value-objects/user-id.vo';
-import { UserCreatedEvent } from '../events/user-created.event';
-import { UserEmailVerifiedEvent } from '../events/user-email-verified.event';
-import { UserPasswordChangedEvent } from '../events/user-password-changed.event';
-import { UserDeactivatedEvent } from '../events/user-deactivated.event';
+import { DisplayName } from '@identity/domain/user/value-objects/display-name.vo';
+import { Email } from '@identity/domain/user/value-objects/email.vo';
+import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
+import { UserCreatedEvent } from '@identity/domain/user/events/user-created.event';
+import { UserEmailVerifiedEvent } from '@identity/domain/user/events/user-email-verified.event';
+import { UserPasswordChangedEvent } from '@identity/domain/user/events/user-password-changed.event';
+import { UserDeactivatedEvent } from '@identity/domain/user/events/user-deactivated.event';
 
 export class User {
   private readonly domainEvents: Array<

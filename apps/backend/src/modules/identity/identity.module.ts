@@ -1,35 +1,45 @@
 import { Module } from '@nestjs/common';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { CreateUserUseCase } from './application/create-user/handler/create-user.use-case';
+import { PassportModule } from '@nestjs/passport';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ChangePasswordUseCase } from './application/change-password/handler/change-password.use-case';
-import { VerifyEmailUseCase } from './application/verify-email/handler/verify-email.use-case';
+import { CreateUserUseCase } from './application/create-user/handler/create-user.use-case';
+import { GetMyPermissionsUseCase } from './application/get-my-permissions/handler/get-my-permissions.use-case';
+import { GetMyRolesUseCase } from './application/get-my-roles/handler/get-my-roles.use-case';
+import { GetMyTeamsUseCase } from './application/get-my-teams/handler/get-my-teams.use-case';
+import { GetUserUseCase } from './application/get-user/handler/get-user.use-case';
+import { LoginUseCase } from './application/login/handler/login.use-case';
+import { LogoutUseCase } from './application/logout/handler/logout.use-case';
+import { RefreshSessionUseCase } from './application/refresh-session/handler/refresh-session.use-case';
 import { RequestPasswordResetUseCase } from './application/request-password-reset/handler/request-password-reset.use-case';
 import { ResetPasswordUseCase } from './application/reset-password/handler/reset-password.use-case';
+import { CurrentUserReadPort } from './application/shared/port/current-user-read.port';
 import { EmailVerificationTokenPort } from './application/shared/port/email-verification-token.port';
 import { PasswordHashingPort } from './application/shared/port/password-hashing.port';
 import { PasswordResetTokenPort } from './application/shared/port/password-reset-token.port';
+import { RefreshTokenPort } from './application/shared/port/refresh-token.port';
+import { TokenSigningPort } from './application/shared/port/token-signing.port';
 import { UserIdGeneratorPort } from './application/shared/port/user-id-generator.port';
+import { UpdateProfileUseCase } from './application/update-profile/handler/update-profile.use-case';
+import { VerifyEmailUseCase } from './application/verify-email/handler/verify-email.use-case';
 import { UserRepositoryPort } from './domain/user/repository/user-repository.port';
+import { AuthController } from './infrastructure/http/auth.controller';
+import { UserController } from './infrastructure/http/user.controller';
+import { CryptoUserIdGeneratorAdapter } from './infrastructure/ids/crypto/crypto-user-id-generator.adapter';
+import { TypeOrmCurrentUserReadAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-current-user-read.adapter';
 import { TypeOrmEmailVerificationTokenAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-email-verification-token.adapter';
 import { TypeOrmPasswordResetTokenAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-password-reset-token.adapter';
-import { TypeOrmUserRepositoryAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-user-repository.adapter';
 import { TypeOrmRefreshTokenAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-refresh-token.adapter';
+import { TypeOrmUserRepositoryAdapter } from './infrastructure/persistence/typeorm/adapters/typeorm-user-repository.adapter';
 import { EmailVerificationTokenOrmEntity } from './infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import { PasswordResetTokenOrmEntity } from './infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
 import { RefreshTokenOrmEntity } from './infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
 import { UserOrmEntity } from './infrastructure/persistence/typeorm/entities/user.orm-entity';
 import { CryptoPasswordHashingAdapter } from './infrastructure/security/crypto/crypto-password-hashing.adapter';
-import { CryptoUserIdGeneratorAdapter } from './infrastructure/ids/crypto/crypto-user-id-generator.adapter';
-import { Repository } from 'typeorm';
-import { AuthController } from './infrastructure/http/auth.controller';
-import { UserController } from './infrastructure/http/user.controller';
+import { JwtAuthGuard } from './infrastructure/security/jwt/jwt-auth.guard';
 import { JwtTokenSigningAdapter } from './infrastructure/security/jwt/jwt-token-signing.adapter';
-import { LoginUseCase } from './application/login/handler/login.use-case';
-import { RefreshSessionUseCase } from './application/refresh-session/handler/refresh-session.use-case';
-import { LogoutUseCase } from './application/logout/handler/logout.use-case';
-import { RefreshTokenPort } from './application/shared/port/refresh-token.port';
-import { TokenSigningPort } from './application/shared/port/token-signing.port';
+import { JwtStrategy } from './infrastructure/security/jwt/jwt.strategy';
 
 const USER_REPOSITORY_PORT = 'UserRepositoryPort';
 const PASSWORD_HASHING_PORT = 'PasswordHashingPort';
@@ -38,6 +48,7 @@ const EMAIL_VERIFICATION_TOKEN_PORT = 'EmailVerificationTokenPort';
 const PASSWORD_RESET_TOKEN_PORT = 'PasswordResetTokenPort';
 const REFRESH_TOKEN_PORT = 'RefreshTokenPort';
 const TOKEN_SIGNING_PORT = 'TokenSigningPort';
+const CURRENT_USER_READ_PORT = 'CurrentUserReadPort';
 
 @Module({
   imports: [
@@ -47,6 +58,7 @@ const TOKEN_SIGNING_PORT = 'TokenSigningPort';
       PasswordResetTokenOrmEntity,
       RefreshTokenOrmEntity,
     ]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
     }),
@@ -86,6 +98,14 @@ const TOKEN_SIGNING_PORT = 'TokenSigningPort';
       useClass: CryptoUserIdGeneratorAdapter,
     },
     {
+      provide: CURRENT_USER_READ_PORT,
+      useFactory: (dataSource: DataSource) =>
+        new TypeOrmCurrentUserReadAdapter(dataSource),
+      inject: [DataSource],
+    },
+    JwtStrategy,
+    JwtAuthGuard,
+    {
       provide: TOKEN_SIGNING_PORT,
       useFactory: (jwtService: JwtService) =>
         new JwtTokenSigningAdapter(jwtService),
@@ -103,7 +123,11 @@ const TOKEN_SIGNING_PORT = 'TokenSigningPort';
           passwordHashingPort,
           userIdGeneratorPort,
         ),
-      inject: [USER_REPOSITORY_PORT, PASSWORD_HASHING_PORT, USER_ID_GENERATOR_PORT],
+      inject: [
+        USER_REPOSITORY_PORT,
+        PASSWORD_HASHING_PORT,
+        USER_ID_GENERATOR_PORT,
+      ],
     },
     {
       provide: ChangePasswordUseCase,
@@ -126,7 +150,8 @@ const TOKEN_SIGNING_PORT = 'TokenSigningPort';
       useFactory: (
         userRepository: UserRepositoryPort,
         passwordResetTokenPort: PasswordResetTokenPort,
-      ) => new RequestPasswordResetUseCase(userRepository, passwordResetTokenPort),
+      ) =>
+        new RequestPasswordResetUseCase(userRepository, passwordResetTokenPort),
       inject: [USER_REPOSITORY_PORT, PASSWORD_RESET_TOKEN_PORT],
     },
     {
@@ -187,6 +212,36 @@ const TOKEN_SIGNING_PORT = 'TokenSigningPort';
       useFactory: (refreshTokenPort: RefreshTokenPort) =>
         new LogoutUseCase(refreshTokenPort),
       inject: [REFRESH_TOKEN_PORT],
+    },
+    {
+      provide: GetUserUseCase,
+      useFactory: (userRepository: UserRepositoryPort) =>
+        new GetUserUseCase(userRepository),
+      inject: [USER_REPOSITORY_PORT],
+    },
+    {
+      provide: UpdateProfileUseCase,
+      useFactory: (userRepository: UserRepositoryPort) =>
+        new UpdateProfileUseCase(userRepository),
+      inject: [USER_REPOSITORY_PORT],
+    },
+    {
+      provide: GetMyRolesUseCase,
+      useFactory: (currentUserReadPort: CurrentUserReadPort) =>
+        new GetMyRolesUseCase(currentUserReadPort),
+      inject: [CURRENT_USER_READ_PORT],
+    },
+    {
+      provide: GetMyPermissionsUseCase,
+      useFactory: (currentUserReadPort: CurrentUserReadPort) =>
+        new GetMyPermissionsUseCase(currentUserReadPort),
+      inject: [CURRENT_USER_READ_PORT],
+    },
+    {
+      provide: GetMyTeamsUseCase,
+      useFactory: (currentUserReadPort: CurrentUserReadPort) =>
+        new GetMyTeamsUseCase(currentUserReadPort),
+      inject: [CURRENT_USER_READ_PORT],
     },
   ],
   exports: [

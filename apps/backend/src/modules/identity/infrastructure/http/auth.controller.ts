@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { RequestPasswordResetUseCase } from '../../application/request-password-reset/handler/request-password-reset.use-case';
 import { RequestPasswordResetCommand } from '../../application/request-password-reset/command/request-password-reset.command';
 import { ResetPasswordUseCase } from '../../application/reset-password/handler/reset-password.use-case';
@@ -17,6 +18,7 @@ import { VerifyEmailHttpDto } from './verify-email.http-dto';
 import { LoginHttpDto } from './login.http-dto';
 import { RefreshSessionHttpDto } from './refresh-session.http-dto';
 import { LogoutHttpDto } from './logout.http-dto';
+import { AuthTokensResponseDto } from './auth-tokens.response-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,35 +34,41 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() body: LoginHttpDto,
-  ): Promise<{ userId: string; accessToken: string; refreshToken: string }> {
-    return this.loginUseCase.execute(
+  ): Promise<AuthTokensResponseDto> {
+    const result = await this.loginUseCase.execute(
       new LoginCommand(body.email, body.password),
     );
+    return plainToInstance(AuthTokensResponseDto, result, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post('refresh')
   async refresh(
     @Body() body: RefreshSessionHttpDto,
-  ): Promise<{ userId: string; accessToken: string; refreshToken: string }> {
-    return this.refreshSessionUseCase.execute(
+  ): Promise<AuthTokensResponseDto> {
+    const result = await this.refreshSessionUseCase.execute(
       new RefreshSessionCommand(body.refreshToken),
     );
+    return plainToInstance(AuthTokensResponseDto, result, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post('logout')
-  async logout(@Body() body: LogoutHttpDto): Promise<{ status: string }> {
+  @HttpCode(204)
+  async logout(@Body() body: LogoutHttpDto): Promise<void> {
     await this.logoutUseCase.execute(new LogoutCommand(body.refreshToken));
-    return { status: 'ok' };
   }
 
   @Post('forgot-password')
+  @HttpCode(204)
   async requestPasswordReset(
     @Body() body: RequestPasswordResetHttpDto,
-  ): Promise<{ status: string }> {
+  ): Promise<void> {
     await this.requestPasswordResetUseCase.execute(
       new RequestPasswordResetCommand(body.email),
     );
-    return { status: 'ok' };
   }
 
   @Post('reset-password')

@@ -122,4 +122,8 @@ export class User {
   getEmailVerifiedAt(): Date | null {
     return this.emailVerifiedAt;
   }
+
+  changeDisplayName(displayName: DisplayName): void {
+    this.displayName = displayName;
+  }
 }

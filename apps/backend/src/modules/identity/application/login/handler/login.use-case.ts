@@ -20,6 +20,7 @@ export class LoginUseCase implements LoginPort {
     userId: string;
     accessToken: string;
     refreshToken: string;
+    requirePasswordChange: boolean;
   }> {
     const email = new Email(command.email);
     const user = await this.userRepository.findByEmail(email);
@@ -29,7 +30,6 @@ export class LoginUseCase implements LoginPort {
     if (!user.isUserActive()) {
       throw new UserException('User is inactive');
     }
-
     const matches = await this.passwordHashingPort.verify(
       command.password,
       user.getPasswordHash().value,
@@ -42,6 +42,11 @@ export class LoginUseCase implements LoginPort {
     const accessToken = await this.tokenSigningPort.signAccessToken(userId);
     const refreshToken = await this.refreshTokenPort.create(userId);
 
-    return { userId, accessToken, refreshToken };
+    return {
+      userId,
+      accessToken,
+      refreshToken,
+      requirePasswordChange: user.isPasswordChangeRequired(),
+    };
   }
 }

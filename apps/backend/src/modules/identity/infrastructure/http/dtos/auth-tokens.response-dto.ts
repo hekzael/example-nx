@@ -9,4 +9,7 @@ export class AuthTokensResponseDto {
 
   @Expose()
   readonly refreshToken!: string;
+
+  @Expose()
+  readonly requirePasswordChange!: boolean;
 }

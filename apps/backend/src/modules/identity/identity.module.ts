@@ -34,8 +34,12 @@ import { TypeOrmRefreshTokenAdapter } from '@identity/infrastructure/persistence
 import { TypeOrmUserRepositoryAdapter } from '@identity/infrastructure/persistence/typeorm/adapters/typeorm-user-repository.adapter';
 import { EmailVerificationTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import { PasswordResetTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
+import { PlatformPermissionOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/platform-permission.orm-entity';
+import { PlatformRoleOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/platform-role.orm-entity';
+import { PlatformRolePermissionOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/platform-role-permission.orm-entity';
 import { RefreshTokenOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
 import { UserOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/user.orm-entity';
+import { UserPlatformRoleOrmEntity } from '@identity/infrastructure/persistence/typeorm/entities/user-platform-role.orm-entity';
 import { CryptoPasswordHashingAdapter } from '@identity/infrastructure/security/crypto/crypto-password-hashing.adapter';
 import { JwtAuthGuard } from '@identity/infrastructure/security/jwt/jwt-auth.guard';
 import { JwtTokenSigningAdapter } from '@identity/infrastructure/security/jwt/jwt-token-signing.adapter';
@@ -54,6 +58,10 @@ const CURRENT_USER_READ_PORT = 'CurrentUserReadPort';
   imports: [
     TypeOrmModule.forFeature([
       UserOrmEntity,
+      PlatformRoleOrmEntity,
+      PlatformPermissionOrmEntity,
+      PlatformRolePermissionOrmEntity,
+      UserPlatformRoleOrmEntity,
       EmailVerificationTokenOrmEntity,
       PasswordResetTokenOrmEntity,
       RefreshTokenOrmEntity,

@@ -17,6 +17,9 @@ export class UserOrmEntity {
   @Column({ type: 'boolean', name: 'is_active' })
   isActive!: boolean;
 
+  @Column({ type: 'boolean', name: 'require_password_change' })
+  requirePasswordChange!: boolean;
+
   @Column({ type: 'timestamptz', name: 'email_verified_at', nullable: true })
   emailVerifiedAt!: Date | null;
 

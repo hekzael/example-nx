@@ -21,6 +21,7 @@ export class User {
     private displayName: DisplayName,
     private passwordHash: PasswordHash,
     private isActive: boolean,
+    private requirePasswordChange: boolean,
     private emailVerifiedAt: Date | null,
   ) {}
 
@@ -38,6 +39,7 @@ export class User {
       params.displayName,
       params.passwordHash,
       true,
+      false,
       null,
     );
     user.domainEvents.push(
@@ -52,6 +54,7 @@ export class User {
     displayName: DisplayName;
     passwordHash: PasswordHash;
     isActive: boolean;
+    requirePasswordChange: boolean;
     emailVerifiedAt: Date | null;
   }): User {
     return new User(
@@ -60,6 +63,7 @@ export class User {
       params.displayName,
       params.passwordHash,
       params.isActive,
+      params.requirePasswordChange,
       params.emailVerifiedAt,
     );
   }
@@ -67,6 +71,7 @@ export class User {
   changePassword(params: { passwordHash: PasswordHash; now?: Date }): void {
     const now = params.now ?? new Date();
     this.passwordHash = params.passwordHash;
+    this.requirePasswordChange = false;
     this.domainEvents.push(new UserPasswordChangedEvent(this.userId.value, now));
   }
 
@@ -117,6 +122,14 @@ export class User {
 
   isUserActive(): boolean {
     return this.isActive;
+  }
+
+  isPasswordChangeRequired(): boolean {
+    return this.requirePasswordChange;
+  }
+
+  requirePasswordUpdate(): void {
+    this.requirePasswordChange = true;
   }
 
   getEmailVerifiedAt(): Date | null {

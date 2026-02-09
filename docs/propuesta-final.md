@@ -338,6 +338,7 @@ Politicas de password:
 - Reset tokens TTL: 30 minutos.
 - Verify email tokens TTL: 24 horas.
 - Rate limit en /auth/forgot-password.
+- Cambio forzado: si `require_password_change = true`, el usuario puede iniciar sesion pero queda bloqueado para operar la plataforma hasta cambiar su password. Solo puede acceder a `/me`, `/me/password`, `/auth/refresh` y `/auth/logout`.
 
 Gestion de Recursos:
 

@@ -26,6 +26,7 @@ export class InitialSchema1770619532794 implements MigrationInterface {
         "display_name" text NOT NULL CHECK (length("display_name") <= 255),
         "password_hash" text NOT NULL CHECK (length("password_hash") <= 255),
         "is_active" boolean NOT NULL DEFAULT true,
+        "require_password_change" boolean NOT NULL DEFAULT false,
         "email_verified_at" timestamptz,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now(),
@@ -33,6 +34,67 @@ export class InitialSchema1770619532794 implements MigrationInterface {
         "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL
       )
     `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."platform_role" (
+        "platform_role_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "name" text NOT NULL CHECK (length("name") <= 255),
+        "description" text CHECK (length("description") <= 1000),
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        UNIQUE ("name")
+      )
+    `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."platform_permission" (
+        "platform_permission_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "action" text NOT NULL CHECK (length("action") <= 100),
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        UNIQUE ("action")
+      )
+    `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."platform_role_permission" (
+        "platform_role_id" uuid NOT NULL REFERENCES "identity"."platform_role"("platform_role_id") ON DELETE CASCADE,
+        "platform_permission_id" uuid NOT NULL REFERENCES "identity"."platform_permission"("platform_permission_id") ON DELETE CASCADE,
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        PRIMARY KEY ("platform_role_id", "platform_permission_id")
+      )
+    `);
+
+    await queryRunner.query(`
+      CREATE TABLE "identity"."user_platform_role" (
+        "user_platform_role_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "user_id" uuid NOT NULL REFERENCES "identity"."user"("user_id") ON DELETE CASCADE,
+        "platform_role_id" uuid NOT NULL REFERENCES "identity"."platform_role"("platform_role_id") ON DELETE CASCADE,
+        "valid_from" timestamptz NOT NULL,
+        "valid_until" timestamptz,
+        "created_at" timestamptz NOT NULL DEFAULT now(),
+        "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "created_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL,
+        "updated_by" uuid REFERENCES "identity"."user"("user_id") ON DELETE SET NULL
+      )
+    `);
+
+    await queryRunner.query(
+      'CREATE INDEX "idx_platform_role_permission_permission_id" ON "identity"."platform_role_permission" ("platform_permission_id")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_user_platform_role_user_id" ON "identity"."user_platform_role" ("user_id")',
+    );
+    await queryRunner.query(
+      'CREATE INDEX "idx_user_platform_role_role_id" ON "identity"."user_platform_role" ("platform_role_id")',
+    );
 
     await queryRunner.query(`
       CREATE TABLE "identity"."email_verification_token" (
@@ -338,6 +400,15 @@ export class InitialSchema1770619532794 implements MigrationInterface {
       'DROP INDEX IF EXISTS "identity"."idx_email_verification_token_user_id"',
     );
     await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_user_platform_role_role_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_user_platform_role_user_id"',
+    );
+    await queryRunner.query(
+      'DROP INDEX IF EXISTS "identity"."idx_platform_role_permission_permission_id"',
+    );
+    await queryRunner.query(
       'DROP INDEX IF EXISTS "projects"."idx_project_role_permission_project_permission_id"',
     );
     await queryRunner.query(
@@ -409,6 +480,16 @@ export class InitialSchema1770619532794 implements MigrationInterface {
     await queryRunner.query(
       'DROP TABLE IF EXISTS "identity"."email_verification_token"',
     );
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "identity"."user_platform_role"',
+    );
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "identity"."platform_role_permission"',
+    );
+    await queryRunner.query(
+      'DROP TABLE IF EXISTS "identity"."platform_permission"',
+    );
+    await queryRunner.query('DROP TABLE IF EXISTS "identity"."platform_role"');
     await queryRunner.query('DROP TABLE IF EXISTS "identity"."user"');
 
     await queryRunner.query('DROP SCHEMA IF EXISTS "audit"');

@@ -44,6 +44,7 @@ export class TypeOrmUserRepositoryAdapter implements UserRepositoryPort {
       displayName: new DisplayName(orm.displayName),
       passwordHash: new PasswordHash(orm.passwordHash),
       isActive: orm.isActive,
+      requirePasswordChange: orm.requirePasswordChange,
       emailVerifiedAt: orm.emailVerifiedAt,
     });
   }
@@ -55,6 +56,7 @@ export class TypeOrmUserRepositoryAdapter implements UserRepositoryPort {
     orm.displayName = user.getDisplayName().value;
     orm.passwordHash = user.getPasswordHash().value;
     orm.isActive = user.isUserActive();
+    orm.requirePasswordChange = user.isPasswordChangeRequired();
     orm.emailVerifiedAt = user.getEmailVerifiedAt();
     return orm;
   }

@@ -5,5 +5,6 @@ export interface LoginPort {
     userId: string;
     accessToken: string;
     refreshToken: string;
+    requirePasswordChange: boolean;
   }>;
 }

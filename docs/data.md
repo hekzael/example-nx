@@ -4,53 +4,40 @@
 
 ## ERD
 
-### Entidades y relaciones
+### Entidades y relaciones (Updated)
 
-- projects 1..* modules
-- projects 1..* environments
-- projects 0..* tools (via project_tools)
-- teams 2..* users (via team_members, type leader/leader_temp)
-- users 0..* roles (via user_roles)
-- roles 0..* permissions (via role_permissions)
-- users 0..* permissions (via user_permissions)
-- requests 1..1 projects
-- requests 1..1 tools
-- requests 1..1 environments
-- requests 0..1 modules
-- requests 0..* approvals
-- requests 0..* executions
-- audit_events 0..* (requests, approvals, executions, role/permission changes)
+- `projects` 1..\* `project_environments`
+- `projects` 1..\* `project_modules`
+- `teams` 1..\* `team_modules` (assigns team to modules)
+- `teams` 1..\* `team_members` (assigns users to teams)
+- `users` 1..\* `user_project_roles` (assigns roles in projects)
+- `project_roles` 1..\* `project_role_permissions`
+- `project_permissions` (defines scope context: module/env/action)
 
-### Tablas de relacion (join)
+### Tablas de relación (Pivot)
 
-- project_tools (project_id, tool_id)
-- team_members (team_id, user_id, type, from, to)
-- user_roles (user_id, role_id, from, to)
-- role_permissions (role_id, permission_id)
-- user_permissions (user_id, permission_id, scope_type, scope_id, from, to)
+- `team_modules`: (team_id, module_id)
+- `team_members`: (team_id, user_id, role, valid_from, valid_to)
+- `user_project_roles`: (user_id, project_id, role_id, start_at, end_at)
+- `project_role_permissions`: (role_id, permission_id)
 
 ## Modelo de permisos y scope
 
-- `permissions` modela la accion (ej. `sql.run`, `deploy.execute`, `requests.approve`).
-- `scope_type` define el alcance: `global | project | module | environment`.
-- `scope_id` es el ID concreto del recurso.
-- La disponibilidad de una herramienta se controla por contexto con `project_tools`.
+- `project_permissions` define la tupla única: `(project_id, module_id?, environment_id?, action)`.
+- Si `module_id` es NULL -> Permiso a nivel Proyecto.
+- Si `environment_id` es NULL -> Permiso en todos los entornos.
 
 ## Entidades persistentes
 
-- projects
-- modules
-- teams
-- users
-- roles
-- permissions
-- tools
-- environments
-- requests
-- approvals
-- executions
-- audit_events
-
-
-
-
+1. `users`
+2. `projects`
+3. `project_environments`
+4. `project_modules`
+5. `teams`
+6. `team_modules`
+7. `team_members`
+8. `project_roles`
+9. `project_permissions`
+10. `project_role_permissions`
+11. `user_project_roles`
+12. `audit_logs`

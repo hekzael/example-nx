@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { IdentityModule } from '../modules/identity/identity.module';
+import { DatabaseModule } from '../main/database/database.module';
+import { IdentityTypeormModule } from '../modules/identity/identity-typeorm.module';
 
 @Module({
-  imports: [IdentityModule],
+  imports: [
+    DatabaseModule,
+    IdentityTypeormModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

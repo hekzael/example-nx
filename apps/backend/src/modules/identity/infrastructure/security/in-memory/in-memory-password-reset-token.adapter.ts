@@ -1,4 +1,4 @@
-import { PasswordResetTokenPort } from '../../application/shared/ports/password-reset-token.port';
+import { PasswordResetTokenPort } from '../../../application/shared/ports/password-reset-token.port';
 
 type TokenRecord = {
   userId: string;
@@ -7,7 +7,9 @@ type TokenRecord = {
 
 const TTL_MS = 30 * 60 * 1000;
 
-export class InMemoryPasswordResetTokenAdapter implements PasswordResetTokenPort {
+export class InMemoryPasswordResetTokenAdapter
+  implements PasswordResetTokenPort
+{
   private readonly tokens = new Map<string, TokenRecord>();
 
   async generate(userId: string): Promise<string> {

@@ -1,9 +1,11 @@
-import { PermissionRepositoryPort } from '../../domain/permission/repository/permission-repository.port';
-import { Permission } from '../../domain/permission/entity/permission.entity';
-import { PermissionId } from '../../domain/permission/value-objects/permission-id.vo';
-import { PermissionKey } from '../../domain/permission/value-objects/permission-key.vo';
+import { Permission } from '../../../domain/permission/entity/permission.entity';
+import { PermissionRepositoryPort } from '../../../domain/permission/repository/permission-repository.port';
+import { PermissionId } from '../../../domain/permission/value-objects/permission-id.vo';
+import { PermissionKey } from '../../../domain/permission/value-objects/permission-key.vo';
 
-export class InMemoryPermissionRepositoryAdapter implements PermissionRepositoryPort {
+export class InMemoryPermissionRepositoryAdapter
+  implements PermissionRepositoryPort
+{
   private readonly permissions = new Map<string, Permission>();
 
   async findById(id: PermissionId): Promise<Permission | null> {

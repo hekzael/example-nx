@@ -1,4 +1,4 @@
-import { IdGeneratorPort } from '../../application/shared/ports/id-generator.port';
+import { IdGeneratorPort } from '../../../application/shared/ports/id-generator.port';
 
 export class InMemoryIdGeneratorAdapter implements IdGeneratorPort {
   private counter = 0;

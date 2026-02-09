@@ -18,6 +18,13 @@ export class Permission {
     });
   }
 
+  static rehydrate(props: PermissionProps): Permission {
+    return new Permission({
+      ...props,
+      description: props.description ?? null,
+    });
+  }
+
   get id(): PermissionId {
     return this.props.id;
   }

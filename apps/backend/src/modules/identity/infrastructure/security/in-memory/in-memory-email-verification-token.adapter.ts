@@ -1,4 +1,4 @@
-import { EmailVerificationTokenPort } from '../../application/shared/ports/email-verification-token.port';
+import { EmailVerificationTokenPort } from '../../../application/shared/ports/email-verification-token.port';
 
 type TokenRecord = {
   userId: string;
@@ -7,7 +7,9 @@ type TokenRecord = {
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 
-export class InMemoryEmailVerificationTokenAdapter implements EmailVerificationTokenPort {
+export class InMemoryEmailVerificationTokenAdapter
+  implements EmailVerificationTokenPort
+{
   private readonly tokens = new Map<string, TokenRecord>();
 
   async generate(userId: string): Promise<string> {

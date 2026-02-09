@@ -1,7 +1,7 @@
-import { RoleRepositoryPort } from '../../domain/role/repository/role-repository.port';
-import { Role } from '../../domain/role/entity/role.entity';
-import { RoleId } from '../../domain/role/value-objects/role-id.vo';
-import { RoleName } from '../../domain/role/value-objects/role-name.vo';
+import { Role } from '../../../domain/role/entity/role.entity';
+import { RoleRepositoryPort } from '../../../domain/role/repository/role-repository.port';
+import { RoleId } from '../../../domain/role/value-objects/role-id.vo';
+import { RoleName } from '../../../domain/role/value-objects/role-name.vo';
 
 export class InMemoryRoleRepositoryAdapter implements RoleRepositoryPort {
   private readonly roles = new Map<string, Role>();

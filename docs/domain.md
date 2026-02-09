@@ -4,66 +4,74 @@
 
 | Termino               | Definicion                                                                    |
 | --------------------- | ----------------------------------------------------------------------------- |
-| Proyecto              | Producto o iniciativa dentro de la plataforma.                             |
+| Proyecto              | Producto o iniciativa dentro de la plataforma.                                |
 | Modulo                | Parte funcional de un proyecto.                                               |
 | Equipo                | Grupo de usuarios asignados a un proyecto/modulo.                             |
 | Usuario               | Persona con acceso a la plataforma.                                           |
 | Rol                   | Conjunto de permisos.                                                         |
 | Permiso               | Accion granular dentro del sistema.                                           |
 | Herramienta           | Utilidad operativa (SQL Runner, Deploy Runner).                               |
-| Ambiente de operación | Etapa del flujo de un proyecto (dev, demo, staging, prod).                    |
+| Ambiente de operaciÃ³n | Etapa del flujo de un proyecto (dev, demo, staging, prod).                    |
 | Solicitud             | Pedido para ejecutar una accion en una herramientra sobre un proyecto/modulo. |
-| Aprobación            | Decision sobre una solicitud.                                                 |
-| Ejecución             | Resultado de la solicitud con auditoría.                                      |
+| AprobaciÃ³n            | Decision sobre una solicitud.                                                 |
+| EjecuciÃ³n             | Resultado de la solicitud con auditorÃ­a.                                      |
 
 ## Domain Model
 
 ## Bounded Contexts
 
 - Identidad y Acceso (Usuarios, Roles, Permisos)
-- Proyecto y Equipo (Proyectos, Módulos, Equipos, Ambiente de operación)
-- Operación de Herramientas (Herramientas, Solicitudes, Aprobaciónes, Ejecuciónes)
-- Auditoría (Eventos)
+- Proyecto y Equipo (Proyectos, Mï¿½dulos, Equipos, Ambiente de operaciï¿½n)
+- Operaciï¿½n de Herramientas (Herramientas, Solicitudes, Aprobaciï¿½nes, Ejecuciï¿½nes)
+- Auditorï¿½a (Eventos)
 
 ## Context Map
 
-Identidad y Acceso provee autorización al resto. Proyectos y Equipos define el alcance operativo. Operación de Herramientas consume ambos y publica eventos de Auditoría.
+Identidad y Acceso provee autorizaciï¿½n al resto. Proyectos y Equipos define el alcance operativo. Operaciï¿½n de Herramientas consume ambos y publica eventos de Auditorï¿½a.
 
 ## Entidades
 
-- Proyecto: agrupa módulos y equipos asignados.
+- **Usuario**: Persona con acceso (email, display_name).
+- **Proyecto**: Agrupa mÃ³dulos, entornos y equipos.
+- **MÃ³dulo**: Unidad funcional dentro de un proyecto.
+- **Entorno**: Instancia de despliegue configurada por proyecto (dev, prod).
+- **Equipo**: Grupo de usuarios asignados a mÃ³dulos.
+- **Solicitud**: PeticiÃ³n de ejecuciÃ³n de herramienta.
+
+## Entidades (Deprecated)
+
+- Proyecto: agrupa mï¿½dulos y equipos asignados.
 - Equipo: usuarios con roles en un proyecto.
 - Solicitud: estado y datos de la accion solicitada.
 
 ## Value Objects
 
-- AmbienteOperaciónTipo (dev, demo, staging, prod)
+- AmbienteOperaciï¿½nTipo (dev, demo, staging, prod)
 - RolTemporal (periodo de vigencia)
 
 ## Agregados
 
-
 - Proyecto (root).
 - Equipo (root).
-- Solicitud (root) con Aprobaciónes y Ejecuciónes.
+- Solicitud (root) con Aprobaciï¿½nes y Ejecuciï¿½nes.
 
 ## Relaciones (cardinalidades)
 
-- Proyecto 1..* Módulos
-- Proyecto 0..* Equipos (equipos asignados a proyectos)
-- Equipo 2..* Usuarios (via team_members)
+- Proyecto 1..\* Mï¿½dulos
+- Proyecto 0..\* Equipos (equipos asignados a proyectos)
+- Equipo 2..\* Usuarios (via team_members)
 - Equipo 0..2 Usuarios con type leader/leader_temp (en team_members)
-- Usuario 0..* Roles
-- Rol 0..* Permisos
-- Usuario 0..* Permisos (asignaciones directas)
-- Proyecto 1..* AmbientesOperación
-- Proyecto 0..* Herramientas habilitadas
+- Usuario 0..\* Roles
+- Rol 0..\* Permisos
+- Usuario 0..\* Permisos (asignaciones directas)
+- Proyecto 1..\* AmbientesOperaciï¿½n
+- Proyecto 0..\* Herramientas habilitadas
 - Solicitud 1..1 Proyecto
 - Solicitud 1..1 Herramienta
-- Solicitud 1..1 AmbienteOperación
+- Solicitud 1..1 AmbienteOperaciï¿½n
 - Solicitud 0..1 Modulo
-- Solicitud 0..* Aprobaciónes
-- Solicitud 0..* Ejecuciónes
+- Solicitud 0..\* Aprobaciï¿½nes
+- Solicitud 0..\* Ejecuciï¿½nes
 
 ## Invariantes (minimas)
 
@@ -71,16 +79,16 @@ Identidad y Acceso provee autorización al resto. Proyectos y Equipos define el a
 - Un Modulo debe pertenecer a un Proyecto.
 - Un Equipo debe tener al menos 2 miembros.
 - Un Equipo puede tener hasta 2 miembros con type leader/leader_temp.
-- Un Usuario solo puede solicitar sobre proyectos/módulos a los que su equipo este asignado.
+- Un Usuario solo puede solicitar sobre proyectos/mï¿½dulos a los que su equipo este asignado.
 - Una Solicitud solo puede ejecutarse si fue aprobada segun sus reglas.
-- Aprobación minima: 1, configurable a 2 o 3.
-- Se puede requerir aprobación de un rol especifico, configurable por entorno.
-- Las reglas de aprobación (minimo y rol requerido) son configurables por entorno/proyecto.
-- Toda Ejecución debe generar un evento de Auditoría.
+- Aprobaciï¿½n minima: 1, configurable a 2 o 3.
+- Se puede requerir aprobaciï¿½n de un rol especifico, configurable por entorno.
+- Las reglas de aprobaciï¿½n (minimo y rol requerido) son configurables por entorno/proyecto.
+- Toda Ejecuciï¿½n debe generar un evento de Auditorï¿½a.
 - Permisos temporales deben tener ventana de vigencia (from/to).
 - Una Solicitud solo puede crearse si la herramienta esta habilitada en el proyecto.
 - Modelo de permisos whitelist: si no tiene permiso explicito, no puede.
-- Endpoints self-service (/me/*) validan solo JWT (sin permisos).
+- Endpoints self-service (/me/\*) validan solo JWT (sin permisos).
 
 ## Eventos de Dominio (minimos)
 
@@ -322,7 +330,7 @@ Identidad y Acceso provee autorización al resto. Proyectos y Equipos define el a
 ## Reglas
 
 - Solo puede modificar su propio perfil.
-- Email cambio requiere verificación.
+- Email cambio requiere verificaciï¿½n.
 
 ## Eventos
 
@@ -348,7 +356,3 @@ Identidad y Acceso provee autorización al resto. Proyectos y Equipos define el a
 ## Eventos
 
 - `user.password_changed`
-
-
-
-

@@ -26,6 +26,14 @@ export class Role {
     });
   }
 
+  static rehydrate(props: RoleProps): Role {
+    return new Role({
+      ...props,
+      description: props.description ?? null,
+      permissions: props.permissions ?? [],
+    });
+  }
+
   get id(): RoleId {
     return this.props.id;
   }
@@ -43,7 +51,7 @@ export class Role {
   }
 
   assignPermission(permissionId: PermissionId): void {
-    const exists = this.permissions.some((assigned) =>
+    const exists = (this.props.permissions || []).some((assigned) =>
       assigned.equals(permissionId),
     );
 
@@ -54,7 +62,8 @@ export class Role {
       );
     }
 
-    this.permissions.push(permissionId);
+    this.props.permissions = this.props.permissions ?? [];
+    this.props.permissions.push(permissionId);
 
     this.addEvent(
       new PermissionAssignedEvent(
@@ -69,13 +78,13 @@ export class Role {
   }
 
   revokePermission(permissionId: PermissionId): void {
-    const initialLength = this.permissions.length;
+    const initialLength = (this.props.permissions || []).length;
 
-    this.props.permissions = this.permissions.filter(
+    this.props.permissions = (this.props.permissions || []).filter(
       (assigned) => !assigned.equals(permissionId),
     );
 
-    if (this.permissions.length === initialLength) {
+    if ((this.props.permissions || []).length === initialLength) {
       throw new DomainException(
         'ROLE_PERMISSION_NOT_FOUND',
         'Permiso no asignado al rol.',

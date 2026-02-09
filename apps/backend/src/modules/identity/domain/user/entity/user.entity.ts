@@ -56,6 +56,16 @@ export class User {
     return user;
   }
 
+  static rehydrate(props: UserProps): User {
+    return new User({
+      ...props,
+      displayName: props.displayName.trim(),
+      emailVerifiedAt: props.emailVerifiedAt ?? null,
+      roleAssignments: props.roleAssignments ?? [],
+      permissionAssignments: props.permissionAssignments ?? [],
+    });
+  }
+
   get id(): UserId {
     return this.props.id;
   }

@@ -1,4 +1,4 @@
-import { PasswordHashingPort } from '../../application/shared/ports/password-hashing.port';
+import { PasswordHashingPort } from '../../../application/shared/ports/password-hashing.port';
 
 export class InMemoryPasswordHashingAdapter implements PasswordHashingPort {
   async hash(plain: string): Promise<string> {

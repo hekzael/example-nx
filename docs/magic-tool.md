@@ -1,4 +1,4 @@
-# Propuesta Unificada del Proyecto
+﻿# Magic Tool - Documento de Proyecto
 
 > Estado: Draft  
 > Ultima actualizacion: 2026-02-09  
@@ -6,21 +6,21 @@
 
 ## 1. Vision y Objetivos
 
-El objetivo es desarrollar una plataforma centralizada y escalable para gestionar el ciclo de vida de desarrollo de multiples proyectos, orquestando permisos, equipos y operaciones criticas (despliegues, scripts, configuraciones) de manera segura y auditable.
+El objetivo es desarrollar una plataforma centralizada y escalable para gestionar el ciclo de vida de desarrollo de multiples proyectos, orquestando equipos y operaciones criticas (despliegues, scripts, configuraciones) de manera segura y auditable.
 
 Metas principales:
 
-- Escalabilidad: separar definicion de permisos (roles) de asignacion de personas (equipos).
-- Seguridad granular: control de acceso por contexto `Proyecto -> Modulo -> Entorno`.
+- Escalabilidad: separar definicion de estructuras (proyectos, modulos, entornos) de la asignacion de personas (equipos).
+- Seguridad operativa: ejecuciones controladas por solicitudes y aprobaciones.
 - Auditoria total: trazabilidad completa de quien autorizo y ejecuto cada accion.
-- Flexibilidad operativa: flujos de aprobacion configurables y roles temporales.
+- Flexibilidad operativa: flujos de aprobacion configurables y roles temporales internos de equipo.
 
 ## 2. Problema, Impacto y Propuesta de Valor
 
 Problema actual:
 
 - Solicitudes manuales, aprobaciones por chat/correo y ejecuciones sin registro centralizado.
-- Herramientas aisladas y permisos ad-hoc sin gobernanza.
+- Herramientas aisladas y procesos ad-hoc sin gobernanza.
 
 Impacto:
 
@@ -30,7 +30,7 @@ Impacto:
 
 Propuesta de valor:
 
-- Control granular de permisos, trazabilidad completa y flujo estandarizado para cambios en datos y despliegues sin frenar la velocidad del equipo.
+- Trazabilidad completa y flujo estandarizado para cambios en datos y despliegues sin frenar la velocidad del equipo.
 
 Usuarios objetivo:
 
@@ -56,17 +56,15 @@ No-objetivos:
 Alcance funcional:
 
 - Gestion de proyectos, modulos, entornos y equipos.
-- Gestion de usuarios, roles y permisos, incluyendo asignaciones temporales.
+- Gestion de usuarios.
 - Configuracion de ambientes por proyecto.
 - Gestion de herramientas: SQL Runner y Deploy Runner.
 - Flujo de solicitudes: crear, aprobar o rechazar, comentar, ejecutar y auditar.
 
 MVP incluye:
 
-- Alta de usuarios, roles, permisos y herramientas.
+- Alta de usuarios y herramientas.
 - Alta de equipos, proyectos, modulos y ambientes.
-- Asignar permisos a roles y usuarios, con vigencia temporal opcional.
-- Asignar roles a usuarios, con vigencia temporal opcional.
 - Asignar herramientas a proyectos.
 - Solicitudes, aprobacion o rechazo, ejecucion y auditoria.
 
@@ -79,11 +77,10 @@ MVP excluye:
 Alcance tecnico inicial:
 
 - Tenancy: single-tenant (tenant implicito, sin multi-tenant).
-- Permisos: por use-case y scope (`global | project | module | environment`).
-- Aprobaciones: minimo 1, configurable a 2 o 3, rol requerido configurable por entorno.
+- Aprobaciones: minimo 1, configurable a 2 o 3.
 - Herramientas: habilitadas solo por proyecto.
-- Self-service: `/me/*` JWT-only (sin permisos).
-- Backoffice: admin completo y roles parciales configurables.
+- Self-service: `/me/*` JWT-only (sin controles adicionales).
+- Backoffice: admin completo para configuraciones maestras.
 
 ## 4. Modelo de Dominio y Lenguaje Ubicuo
 
@@ -93,8 +90,6 @@ Terminos clave:
 - Modulo: componente funcional dentro de un proyecto.
 - Entorno: instancia de despliegue (dev, staging, prod, etc.).
 - Equipo: grupo de personas responsables de uno o mas modulos.
-- Rol de proyecto: conjunto de permisos en un proyecto.
-- Permiso: accion granular sobre un recurso.
 - Herramienta: utilidad operativa (SQL Runner, Deploy Runner).
 - Solicitud: peticion para ejecutar una accion sobre un recurso.
 - Aprobacion: decision sobre una solicitud.
@@ -109,7 +104,7 @@ Bounded contexts:
 
 Context map:
 
-- Identidad y Acceso provee autorizacion al resto.
+- Identidad y Acceso provee autenticacion al resto.
 - Proyectos y Equipos define el alcance operativo.
 - Operacion de Herramientas consume ambos y publica eventos de Auditoria.
 
@@ -127,68 +122,7 @@ Actores y equipos:
 - Equipo: unidad operativa asignada a modulos de un proyecto.
 - Roles internos del equipo: `LEADER_PRIMARY`, `LEADER_TEMP`, `MEMBER`.
 
-## 6. Modelo de Permisos
-
-Principios:
-
-- Modelo whitelist: sin permiso explicito, no hay acceso.
-- No existe blacklist o deny explicito.
-- El permiso define la accion, el scope define el alcance.
-
-Scopes:
-
-- `global | project | module | environment` + `scopeId`.
-
-Formato logico del permiso:
-
-- `context:module:environment:action`.
-
-Catalogo base de acciones (baseline):
-
-- `platform:users:*:list|read|create|update|delete`
-- `platform:roles:*:list|read|create|update|delete|assign-permission|revoke-permission`
-- `platform:permissions:*:list|read|create|update|delete`
-- `platform:projects:*:list|read|create|update|delete`
-- `platform:modules:*:list|create`
-- `platform:environments:*:list|create`
-- `platform:teams:*:list|create|add-member|remove-member|assign-module|remove-module`
-- `platform:tools:*:list`
-- `project:tools:*:enable`
-- `project:requests:*:list|read|create|update|approve|reject|execute|comment`
-- `platform:audit:*:read`
-- `self:me:*:read|update`
-- `self:roles:*:read`
-- `self:permissions:*:read`
-- `self:teams:*:read`
-- `self:requests:*:read`
-- `self:approvals:*:read`
-- `self:audit:*:read`
-- `self:password:*:change`
-
-Reglas de autorizacion:
-
-- Pertenencia: el usuario debe ser miembro activo de un equipo asignado al modulo del proyecto.
-- Capacidad: el usuario debe tener un rol de proyecto que incluya el permiso requerido.
-- Permisos directos: se admiten asignaciones directas a usuario (ademas de roles).
-- Herramienta habilitada: si hay toolId, debe estar habilitada en el proyecto.
-
-Roles temporales y suplencias:
-
-- Asignaciones con `valid_from` y `valid_until` para cubrir vacaciones o roles temporales.
-
-Roles globales:
-
-- `PLATFORM_ADMIN`: gestiona ABM maestros, no implica acceso operativo a proyectos salvo asignacion.
-- `AUDITOR`: solo lectura de auditoria y configuracion (`platform:audit:*:read`, `project:*:*:read`).
-
-Ejemplos:
-
-- Usuario Ana (Developer) en proyecto A, equipo asignado al modulo Pagos.
-- Permiso en rol: `project:deploy:dev:execute`.
-- Resultado: Ana puede ejecutar deploy en Dev de Pagos, pero no en Prod ni en otros modulos.
-- Permiso directo: `project:sql:prod:execute` habilita ejecucion puntual sin cambiar el rol.
-
-## 7. Modelo de Datos (Resumen)
+## 6. Modelo de Datos (Resumen)
 
 Entidades principales:
 
@@ -199,10 +133,6 @@ Entidades principales:
 - `team`
 - `team_module`
 - `team_member`
-- `project_role`
-- `project_permission`
-- `project_role_permission`
-- `user_project_role`
 - `audit_log`
 - `tool`
 - `project_tool`
@@ -211,12 +141,6 @@ Entidades principales:
 - `request_execution`
 - `request_comment`
 - `request_event`
-
-Reglas de permisos en datos:
-
-- `project_permission` define la tupla unica: `(project_id, module_id?, environment_id?, action)`.
-- `module_id` NULL = permiso a nivel proyecto.
-- `environment_id` NULL = permiso en todos los entornos.
 
 Diccionario de datos (tablas core):
 
@@ -245,7 +169,6 @@ Entornos de proyecto (project_environment):
 | `name` | String | Development, Production |
 | `priority` | Integer | Orden UI |
 | `min_approvals` | Integer | Default 1 (1-3) |
-| `required_role_id` | UUID | FK -> project_role.project_role_id (nullable) |
 
 Modulos de proyecto (project_module):
 | Columna | Tipo | Descripcion |
@@ -275,38 +198,6 @@ Miembros de equipo (team_member):
 | `team_id` | UUID | FK -> team.team_id |
 | `user_id` | UUID | FK -> user.user_id |
 | `role` | Enum | LEADER_PRIMARY, LEADER_TEMP, MEMBER |
-| `valid_from` | Datetime | Inicio vigencia |
-| `valid_until` | Datetime | Fin vigencia nullable |
-
-Roles de proyecto (project_role):
-| Columna | Tipo | Descripcion |
-| --- | --- | --- |
-| `project_role_id` | UUID | PK |
-| `project_id` | UUID | FK -> project.project_id |
-| `name` | String | Developer, QA, PO |
-
-Permisos (project_permission):
-| Columna | Tipo | Descripcion |
-| --- | --- | --- |
-| `project_permission_id` | UUID | PK |
-| `project_id` | UUID | FK -> project.project_id |
-| `module_id` | UUID | FK -> project_module.project_module_id (nullable) |
-| `environment_id` | UUID | FK -> project_environment.project_environment_id (nullable) |
-| `action` | String | list, read, create, update, approve, reject, execute, comment, enable |
-
-Permisos de rol (project_role_permission):
-| Columna | Tipo | Descripcion |
-| --- | --- | --- |
-| `role_id` | UUID | FK -> project_role.project_role_id |
-| `permission_id` | UUID | FK -> project_permission.project_permission_id |
-
-Asignacion de roles a usuarios (user_project_role):
-| Columna | Tipo | Descripcion |
-| --- | --- | --- |
-| `user_project_role_id` | UUID | PK |
-| `project_id` | UUID | FK -> project.project_id |
-| `user_id` | UUID | FK -> user.user_id |
-| `role_id` | UUID | FK -> project_role.project_role_id |
 | `valid_from` | Datetime | Inicio vigencia |
 | `valid_until` | Datetime | Fin vigencia nullable |
 
@@ -382,7 +273,7 @@ Auditoria (audit_log):
 | Columna | Tipo | Descripcion |
 | --- | --- | --- |
 | `audit_log_id` | UUID | PK |
-| `event_type` | String | request.created, role.assigned, etc. |
+| `event_type` | String | request.created, request.executed, etc. |
 | `entity_type` | String | request, project, user, etc. |
 | `entity_id` | UUID | ID de entidad |
 | `actor_id` | UUID | FK -> user.user_id (nullable si sistema) |
@@ -406,13 +297,11 @@ Auditoria de Solicitudes (request_event):
 | `user_agent` | String | Agente |
 | `metadata` | JSON | Metadata |
 | `occurred_at` | Datetime | Fecha en que ocurre |
-| `created_at` | Datetime | Fecha en qeu se guarda el registro |
+| `created_at` | Datetime | Fecha en que se guarda el registro |
 
 Seeds minimos:
 
 - Tools: `sql_runner`, `deploy_runner`.
-- Roles globales: `PLATFORM_ADMIN`, `AUDITOR`.
-- Permisos base: catalogo de acciones y scopes iniciales.
 
 Indices y uniques (baseline):
 
@@ -423,10 +312,6 @@ Indices y uniques (baseline):
 - `team`: unique (`project_id`, `name`)
 - `team_module`: unique (`team_id`, `module_id`)
 - `team_member`: unique (`team_id`, `user_id`, `valid_from`)
-- `project_role`: unique (`project_id`, `name`)
-- `project_permission`: unique (`project_id`, `module_id`, `environment_id`, `action`)
-- `project_role_permission`: unique (`role_id`, `permission_id`)
-- `user_project_role`: unique (`project_id`, `user_id`, `role_id`, `valid_from`)
 - `tool`: unique (`code`)
 - `project_tool`: unique (`project_id`, `tool_id`)
 - `request`: index (`project_id`, `status`), index (`created_by`)
@@ -436,7 +321,7 @@ Indices y uniques (baseline):
 - `audit_log`: index (`entity_type`, `entity_id`), index (`created_at`)
 - `request_event`: index (`request_id`), index (`occurred_at`)
 
-## 8. Reglas e Invariantes
+## 7. Reglas e Invariantes
 
 Reglas minimas:
 
@@ -447,7 +332,6 @@ Reglas minimas:
 - Solicitud solo puede crearse si la herramienta esta habilitada.
 - Solicitud solo se ejecuta si fue aprobada segun reglas.
 - Aprobacion minima 1, configurable a 2 o 3.
-- Puede requerirse aprobacion de un rol especifico segun entorno.
 - Toda ejecucion debe generar auditoria.
 - Endpoints self-service `/me/*` validan solo JWT valido.
 
@@ -475,13 +359,7 @@ EXECUTING
 Reglas de aprobacion:
 
 - Un usuario solo puede aprobar/rechazar una vez por solicitud.
-- Si existe `required_role_id` en el entorno, el aprobador debe tener ese rol en el proyecto.
 - Una solicitud con rechazo queda en `REJECTED` y no puede ejecutarse.
-
-Value objects:
-
-- AmbienteOperacionTipo (dev, demo, staging, prod).
-- RolTemporal (periodo de vigencia).
 
 Agregados:
 
@@ -491,23 +369,20 @@ Agregados:
 
 Relaciones principales:
 
-- Proyecto 1..\* Modulos.
-- Proyecto 0..\* Equipos.
-- Equipo 2..\* Usuarios (via team_member).
+- Proyecto 1..* Modulos.
+- Proyecto 0..* Equipos.
+- Equipo 2..* Usuarios (via team_member).
 - Equipo 0..2 Usuarios con type leader o leader_temp.
-- Usuario 0..\* Roles.
-- Rol 0..\* Permisos.
-- Usuario 0..\* Permisos (asignaciones directas).
-- Proyecto 1..\* AmbientesOperacion.
-- Proyecto 0..\* Herramientas habilitadas.
+- Proyecto 1..* AmbientesOperacion.
+- Proyecto 0..* Herramientas habilitadas.
 - Solicitud 1..1 Proyecto.
 - Solicitud 1..1 Herramienta.
 - Solicitud 1..1 AmbienteOperacion.
 - Solicitud 0..1 Modulo.
-- Solicitud 0..\* Aprobaciones.
-- Solicitud 0..\* Ejecuciones.
+- Solicitud 0..* Aprobaciones.
+- Solicitud 0..* Ejecuciones.
 
-## 9. Modulos Funcionales
+## 8. Modulos Funcionales
 
 Identidad y Acceso:
 
@@ -560,31 +435,31 @@ Use cases (Application Layer):
 1. `CreateRequest`
    Input: `project_id`, `environment_id`, `module_id?`, `tool_id`, `title`, `description?`, `url_ticket`, `payload`
    Output: `request_id`, `status=PENDING_APPROVAL`
-   Reglas: tool habilitada en proyecto; permisos `project:requests:*:create` con scope.
+   Reglas: tool habilitada en proyecto; `url_ticket` obligatorio.
 
 2. `ApproveRequest`
    Input: `request_id`, `approved_by`, `comment?`
    Output: `request_id`, `status` (puede seguir en `PENDING_APPROVAL` o pasar a `APPROVED`)
-   Reglas: permiso `project:requests:*:approve`, no doble aprobacion, rol requerido por entorno si aplica.
+   Reglas: no doble aprobacion.
 
 3. `RejectRequest`
    Input: `request_id`, `approved_by`, `comment?`
    Output: `request_id`, `status=REJECTED`
-   Reglas: permiso `project:requests:*:reject`, no doble decision.
+   Reglas: no doble decision.
 
 4. `ExecuteRequest`
    Input: `request_id`, `executed_by?`, `comment?`
    Output: `request_execution_id`, `status=EXECUTING|EXECUTED|FAILED`
-   Reglas: permiso `project:requests:*:execute`, aprobaciones completas, tool habilitada.
+   Reglas: aprobaciones completas, tool habilitada.
 
 5. `CommentRequest`
    Input: `request_id`, `body`, `created_by`
    Output: `request_comment_id`
-   Reglas: permiso `project:requests:*:comment`.
+   Reglas: `body` requerido.
 
 6. `GetRequest` / `ListRequests`
    Input: `request_id` o filtros.
-   Reglas: permiso `project:requests:*:read|list`.
+   Reglas: filtros por proyecto/entorno/estado.
 
 Eventos emitidos:
 
@@ -595,7 +470,7 @@ Eventos emitidos:
 
 Integracion Runner:
 
-- SQL Runner: ejecucion sincrona o job async segun tamaño.
+- SQL Runner: ejecucion sincrona o job async segun tamano.
 - Deploy Runner: trigger Rundeck y persistir `executionId`.
 
 Payload requerido por herramienta:
@@ -604,7 +479,7 @@ Payload requerido por herramienta:
   - `payload.sql` (string, requerido)
   - `payload.params` (object, opcional)
   - `payload.dryRun` (boolean, opcional)
-  - La base de datos se resuelve por el scope seleccionado (project/module/environment), no va en el payload.
+  - La base de datos se resuelve por el contexto seleccionado (project/module/environment), no va en el payload.
 
 - Deploy Runner (`tool.code = deploy_runner`):
   - `payload.jobId` (string, requerido)
@@ -647,7 +522,7 @@ Reglas del agregado `Request`:
 
 Servicios de dominio:
 
-- `ApprovalPolicy` calcula si una solicitud cumple `min_approvals` y `required_role_id` del entorno.
+- `ApprovalPolicy` calcula si una solicitud cumple `min_approvals`.
 - `PayloadPolicy` valida payload segun `tool.code`.
 
 Eventos de dominio:
@@ -665,7 +540,7 @@ Repositorios (ports):
 Puertos hacia otros contextos:
 
 - `ToolResolver` (verifica tool habilitada en proyecto)
-- `ScopeResolver` (resuelve scope y entorno para validar permisos)
+- `ScopeResolver` (resuelve contexto y entorno)
 
 Estrategia de payload por herramienta:
 
@@ -681,13 +556,9 @@ Ejemplos:
 Flujo de trabajo estandar:
 
 1. Solicitud: crear solicitud con proyecto, modulo y entorno.
-2. Revision y aprobacion: validar permisos y reglas por entorno.
+2. Revision y aprobacion: validar reglas por entorno.
 3. Ejecucion: automatica o manual segun herramienta.
 4. Auditoria: registro inmutable del ciclo completo.
-
-Auditoria:
-
-- Registro inmutable del ciclo completo.
 
 Integracion Rundeck (Deploy Runner):
 
@@ -696,13 +567,12 @@ Integracion Rundeck (Deploy Runner):
 - Status: GET `/api/41/execution/{executionId}`.
 - Guardar `executionId` en `request_execution.output_ref`.
 
-## 10. Requerimientos No Funcionales
+## 9. Requerimientos No Funcionales
 
 Seguridad:
 
 - Autenticacion JWT + refresh.
-- Autorizacion RBAC + permisos directos a usuario y temporales.
-- Auditoria de solicitudes, aprobaciones, ejecuciones y cambios de permisos.
+- Auditoria de solicitudes, aprobaciones, ejecuciones y cambios de configuracion.
 - Retencion baseline: 12 meses.
 
 Performance:
@@ -728,40 +598,35 @@ Observabilidad:
 
 Soft delete y retencion:
 
-- Soft delete en: `project`, `project_module`, `project_environment`, `team`, `user`, `project_role`.
+- Soft delete en: `project`, `project_module`, `project_environment`, `team`, `user`.
 - No soft delete en: `request`, `request_approval`, `request_execution`, `audit_log` (inmutables).
 - Retencion de `audit_log`: 12 meses (baseline).
 
-## 11. Casos de Uso (FRD)
+## 10. Casos de Uso (FRD)
 
 UC-01 Configuracion general
 Descripcion: configurar parametros globales de la plataforma.
 Actor: Administrador de plataforma.
 Reglas: solo administradores pueden gestionar configuracion.
 
-UC-02 Gestion de roles y permisos
-Descripcion: crear, editar y eliminar roles; asignar permisos.
-Actor: Administrador de plataforma.
-Reglas: permisos granulares y auditables.
-
 UC-03 Gestion de proyectos, modulos y equipos
 Descripcion: crear, editar y eliminar proyectos y modulos; asignar equipos.
 Actor: Administrador de plataforma y usuarios autorizados.
-Reglas: equipos pertenecen a un proyecto, modulos pertenecen a un proyecto
+Reglas: equipos pertenecen a un proyecto, modulos pertenecen a un proyecto.
 
 UC-04 Solicitud SQL Runner
 Descripcion: generar solicitud para ejecutar query o migracion.
-Actor: Usuario con permisos de SQL Runner.
+Actor: Usuario asignado al modulo.
 Reglas: solo en ambientes permitidos y con modulos asignados.
 
 UC-05 Aprobacion o rechazo de solicitud
 Descripcion: aprobar o rechazar solicitudes.
-Actor: Usuario con permisos de aprobacion.
-Reglas: aprobadores solo sobre su equipo o proyecto. Minimo 1 aprobacion, configurable a 2 o 3, con rol requerido configurable por entorno.
+Actor: Usuario aprobado como revisor.
+Reglas: minimo 1 aprobacion, configurable a 2 o 3.
 
 UC-06 Ejecucion y auditoria
 Descripcion: ejecutar solicitud y registrar auditoria.
-Actor: Sistema o usuario con permisos de ejecucion.
+Actor: Sistema o usuario asignado.
 Reglas: toda ejecucion queda auditada.
 
 UC-07 Solicitud Deploy Runner
@@ -775,98 +640,30 @@ Actor: Administrador de plataforma o usuario autorizado.
 
 Casos de uso tecnicos (Application Layer):
 
-CreateUser
-Input: nombre, email, password.
-Output: userId, user.
-Reglas: email unico, password hasheada.
-Eventos: user.created.
+- CreateUser: email unico, password hasheada. Evento `user.created`.
+- ChangePassword: validar password actual y politicas. Evento `user.password_changed`.
+- RequestPasswordReset: token con TTL. Evento `user.password_reset_requested`.
+- ResetPassword: token valido y no expirado. Evento `user.password_reset`.
+- VerifyEmail: token valido y no expirado. Evento `user.email_verified`.
+- SelfServiceProfile: solo puede acceder a su propio perfil.
+- SelfUpdateProfile: cambio de email requiere verificacion. Evento `user.profile_updated`.
+- SelfChangePassword: validar password actual. Evento `user.password_changed`.
 
-AssignBaseRole
-Input: userId, roleId.
-Output: userId, roleId.
-Reglas: rol y usuario deben existir, no duplicar asignaciones.
-Eventos: role.assigned.
-
-GrantPermission
-Input: subjectType (user|role), subjectId, permissionId, scope (global|project|module|environment), scopeId, from (opcional), to (opcional).
-Output: assignmentId.
-Reglas: permissionId valido, scope y scopeId validos, from < to si existen, no duplicar permisos equivalentes.
-Eventos: permission.assigned.
-
-EvaluateAccess
-Input: userId, permissionId, scope (global|project|module|environment), scopeId, toolId (opcional), timestamp (opcional, default: now).
-Output: allowed (boolean), reason (string).
-Reglas: modelo whitelist, aplica RBAC + permisos directos, asignaciones temporales solo en ventana vigente, si hay toolId la herramienta debe estar habilitada.
-Eventos: ninguno.
-
-ChangePassword
-Input: userId, currentPassword, newPassword.
-Output: status.
-Reglas: validar password actual y politicas.
-Eventos: user.password_changed.
-
-RequestPasswordReset
-Input: email.
-Output: status.
-Reglas: si email existe emitir token; respuesta indistinguible si no existe; token con TTL.
-Eventos: user.password_reset_requested.
-
-ResetPassword
-Input: token, newPassword.
-Output: status.
-Reglas: token valido y no expirado; invalidar token al usarlo.
-Eventos: user.password_reset.
-
-VerifyEmail
-Input: token.
-Output: status.
-Reglas: token valido y no expirado; marcar email como verificado.
-Eventos: user.email_verified.
-
-SelfServiceProfile
-Input: userId.
-Output: user.
-Reglas: solo puede acceder a su propio perfil.
-Eventos: ninguno.
-
-SelfUpdateProfile
-Input: userId, campos (nombre, email, etc.).
-Output: user.
-Reglas: solo puede modificar su propio perfil; cambio de email requiere verificacion.
-Eventos: user.profile_updated.
-
-SelfChangePassword
-Input: userId, currentPassword, newPassword.
-Output: status.
-Reglas: solo puede modificar su propia password; validar password actual.
-Eventos: user.password_changed.
-
-## 12. Vertical Slices
+## 11. Vertical Slices
 
 Vertical Slice 1: Create & Execute Request (SQL Runner)
 Objetivo: crear solicitud SQL, aprobarla, ejecutarla y auditarla.
-Precondiciones: herramienta SQL Runner habilitada; permiso `sql.run` en scope `environment`; aprobacion minima 1.
+Precondiciones: herramienta SQL Runner habilitada; aprobacion minima 1.
 Flujo:
 
 1. UI CreateRequest envia POST `/projects/{projectId}/requests` con tool, environmentId, moduleId, payload.sql.
-2. API valida herramienta habilitada y permisos `sql.run`, crea request `PENDING_APPROVAL`.
-3. Aprobacion: POST `/requests/{id}/approve` con validacion de rol y scope.
-4. Ejecucion: POST `/requests/{id}/execute` con validacion de aprobacion y permisos.
+2. API valida herramienta habilitada y crea request `PENDING_APPROVAL`.
+3. Aprobacion: POST `/requests/{id}/approve` con validaciones de estado.
+4. Ejecucion: POST `/requests/{id}/execute` con validacion de aprobacion.
 5. Auditoria: eventos `request.created`, `request.approved`, `request.executed`, `audit.logged`.
    Resultado: solicitud ejecutada y timeline visible en RequestDetail.
 
-Vertical Slice 2: Administracion de Roles y Permisos
-Objetivo: crear rol, asignar permisos por scope y aplicarlo a un usuario.
-Precondiciones: usuario admin con permisos de administracion; proyecto existente.
-Flujo:
-
-1. UI RolesPermissions crea rol via POST `/roles`.
-2. Asigna permisos al rol via POST `/roles/{id}/permissions` con scope y scopeId.
-3. Asigna rol a usuario via POST `/users/{id}/roles` con valid_from/valid_until opcional.
-4. Auditoria: eventos `role.created`, `permission.assigned`, `role.assigned`, `audit.logged`.
-   Resultado: usuario opera segun permisos del rol en el scope definido.
-
-## 13. Arquitectura y Stack
+## 12. Arquitectura y Stack
 
 Estilo:
 
@@ -890,8 +687,8 @@ Comunicacion:
 Mapa de contextos delimitados:
 
 - Identity & Access (Upstream): provee autenticacion y UserId.
-- Projects & Resources (Core Domain): gestiona estructura, provee validacion de scope.
-- Operations & Executions (Generic Subdomain): orquesta ejecuciones, consume permisos.
+- Projects & Resources (Core Domain): gestiona estructura y contexto operativo.
+- Operations & Executions (Generic Subdomain): orquesta ejecuciones.
 - Audit (Supporting Subdomain): ingesta y consulta de eventos.
 
 Reglas para extraer microservicios:
@@ -911,7 +708,7 @@ ADRs:
 - ADR-005 DB principal: PostgreSQL por consistencia transaccional.
 - ADR-006 Deploy Runner: integracion con Rundeck via API.
 
-## 14. Estructura de Carpetas
+## 13. Estructura de Carpetas
 
 Backend (propuesta):
 
@@ -985,15 +782,14 @@ Frontend (propuesta):
 - `apps/frontend/src/modules/projects/`
 - `apps/frontend/src/modules/teams/`
 - `apps/frontend/src/modules/users/`
-- `apps/frontend/src/modules/roles-permissions/`
 - `apps/frontend/src/modules/environments/`
 
-## 15. Experiencia Frontend
+## 14. Experiencia Frontend
 
 Separacion de experiencia:
 
 - Usuario final (operativo): solicitudes, aprobaciones, auditoria, herramientas.
-- Backoffice (administracion): proyectos, modulos, equipos, usuarios, roles y permisos, ambientes, tools.
+- Backoffice (administracion): proyectos, modulos, equipos, usuarios, ambientes, tools.
 
 Pantallas clave (usuario final):
 
@@ -1008,12 +804,11 @@ Pantallas clave (backoffice):
 - Projects
 - Teams
 - Users
-- RolesPermissions
 - Tools
 
 Flujos principales:
 
-1. Crear solicitud: seleccionar herramienta, elegir proyecto/ambiente/modulo, validar permisos, enviar.
+1. Crear solicitud: seleccionar herramienta, elegir proyecto/ambiente/modulo, enviar.
 2. Aprobacion: ver pendientes, validar reglas, aprobar o rechazar con comentario.
 3. Ejecucion: ejecutar solicitud aprobada, registrar resultado.
 4. Auditoria: timeline por solicitud con filtros por estado, ambiente y herramienta.
@@ -1028,7 +823,6 @@ Routing sugerido:
 - `/admin/projects`
 - `/admin/teams`
 - `/admin/users`
-- `/admin/roles-permissions`
 - `/admin/environments`
 - `/admin/tools`
 
@@ -1048,7 +842,6 @@ Navigation map:
 - Admin > Projects
 - Admin > Teams
 - Admin > Users
-- Admin > Roles & Permissions
 - Admin > Environments
 - Admin > Tools
 
@@ -1058,10 +851,9 @@ Wireframes (textual):
 - Request Detail: header con id y status, timeline vertical, payload y contexto, acciones approve/reject/execute.
 - Create Request: wizard con 4 pasos tool, contexto, payload, review.
 - Approvals: lista de pendientes, drawer de detalle, acciones approve/reject.
-- Admin Roles & Permissions: matriz roles x permissions, selector de scope, panel de asignacion.
 - Admin Projects: lista, actions, detalle con modulos, ambientes, tools.
 - Admin Teams: lista, detalle con members y roles internos, acciones de asignacion.
-- Admin Users: lista, detalle de roles y permisos directos, acciones de gestion.
+- Admin Users: lista, detalle de cuenta, acciones de gestion.
 - Admin Tools: lista, detalle de habilitacion por proyecto.
 
 Estados:
@@ -1085,7 +877,7 @@ Self-service (frontend):
 - Edit Profile: actualizar nombre o email, cambio de email requiere verificacion.
 - Change Password: requiere password actual.
 
-## 16. API
+## 15. API
 
 Convenciones:
 
@@ -1095,7 +887,7 @@ Convenciones:
 - Paginacion: `page` (default 1), `pageSize` (default 20, max 100)
 - Orden: `sortBy`, `sortDir` (asc|desc)
 - Busqueda: `q`
-- Filtros comunes: `status`, `roleId`, `permissionId`, `projectId`, `moduleId`, `teamId`, `environmentId`, `tool`
+- Filtros comunes: `status`, `projectId`, `moduleId`, `teamId`, `environmentId`, `tool`
 - Respuesta paginada: `{ items, total, page, pageSize, pages }`
 - Respuesta comun:
   - Create (POST): `201 + recurso`
@@ -1156,24 +948,6 @@ POST /users
 
 PATCH /users/{id}
 { "displayName": "Ana P", "isActive": true }
-
-POST /users/{id}/roles
-{ "projectId": "...", "roleId": "...", "validFrom": "2026-02-09T00:00:00Z", "validUntil": null }
-
-POST /users/{id}/permissions
-{ "permissionId": "...", "scope": "project", "scopeId": "...", "validFrom": null, "validUntil": null }
-```
-
-```json
-// Roles y permisos
-POST /roles
-{ "projectId": "...", "name": "Developer" }
-
-POST /roles/{id}/permissions
-{ "permissionId": "...", "scope": "environment", "scopeId": "..." }
-
-POST /permissions
-{ "projectId": "...", "moduleId": null, "environmentId": null, "action": "request.create" }
 ```
 
 ```json
@@ -1185,7 +959,7 @@ POST /projects/{projectId}/modules
 { "code": "billing", "name": "Billing" }
 
 POST /projects/{projectId}/environments
-{ "code": "prod", "name": "Production", "priority": 1, "minApprovals": 2, "requiredRoleId": "..." }
+{ "code": "prod", "name": "Production", "priority": 1, "minApprovals": 2 }
 ```
 
 ```json
@@ -1212,11 +986,6 @@ POST /requests/{id}/execute
 { "comment": "running" }
 ```
 
-Permisos y scope:
-
-- `permission` modela la accion.
-- `scope` define el alcance con `scopeId`.
-
 Validaciones y formatos (baseline):
 
 - `email`: formato RFC5322, lowercase, max 254.
@@ -1238,7 +1007,7 @@ Matriz de errores (baseline):
 
 - `400` VALIDATION_ERROR: payload invalido o campos faltantes.
 - `401` UNAUTHORIZED: JWT invalido/expirado.
-- `403` FORBIDDEN: sin permiso o scope invalido.
+- `403` FORBIDDEN: acceso no permitido.
 - `404` NOT_FOUND: recurso inexistente.
 - `409` CONFLICT: duplicado por unique o estado invalido.
 - `422` UNPROCESSABLE: reglas de negocio (aprobacion insuficiente, tool no habilitada).
@@ -1255,12 +1024,10 @@ Auth:
 - POST `/auth/verify-email`
 - POST `/me/password`
 
-Self-service (JWT valido, sin permisos):
+Self-service (JWT valido):
 
 - GET `/me`
 - PATCH `/me`
-- GET `/me/roles`
-- GET `/me/permissions`
 - GET `/me/teams`
 - GET `/me/requests`
 - GET `/me/approvals`
@@ -1273,25 +1040,6 @@ Usuarios:
 - GET `/users/{id}`
 - PATCH `/users/{id}`
 - DELETE `/users/{id}`
-- POST `/users/{id}/roles`
-- POST `/users/{id}/roles/temporary`
-- POST `/users/{id}/permissions`
-- POST `/users/{id}/permissions/temporary`
-
-Roles y permisos:
-
-- GET `/roles`
-- POST `/roles`
-- GET `/roles/{id}`
-- PATCH `/roles/{id}`
-- DELETE `/roles/{id}`
-- POST `/roles/{id}/permissions`
-- DELETE `/roles/{id}/permissions/{permissionId}`
-- GET `/permissions`
-- POST `/permissions`
-- GET `/permissions/{id}`
-- PATCH `/permissions/{id}`
-- DELETE `/permissions/{id}`
 
 Proyectos y estructura:
 
@@ -1334,69 +1082,7 @@ Auditoria:
 
 - GET `/audit-events`
 
-### Access Control Matrix (alineada al modelo)
-
-- `/users` GET -> `platform:users:*:list`
-- `/users/{id}` GET -> `platform:users:*:read`
-- `/users` POST -> `platform:users:*:create`
-- `/users/{id}` PATCH -> `platform:users:*:update`
-- `/users/{id}` DELETE -> `platform:users:*:delete`
-- `/users/{id}/roles` POST -> `platform:users:*:assign-role`
-- `/users/{id}/roles/temporary` POST -> `platform:users:*:assign-role`
-- `/users/{id}/permissions` POST -> `platform:users:*:grant-permission`
-- `/users/{id}/permissions/temporary` POST -> `platform:users:*:grant-permission`
-- `/roles` GET -> `platform:roles:*:list`
-- `/roles/{id}` GET -> `platform:roles:*:read`
-- `/roles` POST -> `platform:roles:*:create`
-- `/roles/{id}` PATCH -> `platform:roles:*:update`
-- `/roles/{id}` DELETE -> `platform:roles:*:delete`
-- `/roles/{id}/permissions` POST -> `platform:roles:*:assign-permission`
-- `/roles/{id}/permissions/{permissionId}` DELETE -> `platform:roles:*:revoke-permission`
-- `/permissions` GET -> `platform:permissions:*:list`
-- `/permissions/{id}` GET -> `platform:permissions:*:read`
-- `/permissions` POST -> `platform:permissions:*:create`
-- `/permissions/{id}` PATCH -> `platform:permissions:*:update`
-- `/permissions/{id}` DELETE -> `platform:permissions:*:delete`
-- `/projects` GET -> `platform:projects:*:list`
-- `/projects/{id}` GET -> `platform:projects:*:read`
-- `/projects` POST -> `platform:projects:*:create`
-- `/projects/{id}` PATCH -> `platform:projects:*:update`
-- `/projects/{id}` DELETE -> `platform:projects:*:delete`
-- `/projects/{projectId}/modules` GET -> `platform:modules:*:list`
-- `/projects/{projectId}/modules` POST -> `platform:modules:*:create`
-- `/projects/{projectId}/environments` GET -> `platform:environments:*:list`
-- `/projects/{projectId}/environments` POST -> `platform:environments:*:create`
-- `/teams` GET -> `platform:teams:*:list`
-- `/teams` POST -> `platform:teams:*:create`
-- `/teams/{teamId}/members` POST -> `platform:teams:*:add-member`
-- `/teams/{teamId}/members/{userId}` DELETE -> `platform:teams:*:remove-member`
-- `/teams/{teamId}/modules` POST -> `platform:teams:*:assign-module`
-- `/teams/{teamId}/modules/{moduleId}` DELETE -> `platform:teams:*:remove-module`
-- `/tools` GET -> `platform:tools:*:list`
-- `/projects/{projectId}/tools` POST -> `project:tools:*:enable`
-- `/projects/{projectId}/requests` GET -> `project:requests:*:list`
-- `/projects/{projectId}/requests` POST -> `project:requests:*:create` (Requiere scope)
-- `/requests/{id}` GET -> `project:requests:*:read`
-- `/requests/{id}` PATCH -> `project:requests:*:update`
-- `/requests/{id}/approve` POST -> `project:requests:*:approve` (Requiere scope)
-- `/requests/{id}/reject` POST -> `project:requests:*:reject` (Requiere scope)
-- `/requests/{id}/comment` POST -> `project:requests:*:comment`
-- `/requests/{id}/execute` POST -> `project:requests:*:execute` (Requiere scope)
-- `/audit-events` GET -> `platform:audit:*:read`
-- `/me` GET -> `self:me:*:read`
-- `/me` PATCH -> `self:me:*:update`
-- `/me/roles` GET -> `self:roles:*:read`
-- `/me/permissions` GET -> `self:permissions:*:read`
-- `/me/teams` GET -> `self:teams:*:read`
-- `/me/requests` GET -> `self:requests:*:read`
-- `/me/approvals` GET -> `self:approvals:*:read`
-- `/me/audit-events` GET -> `self:audit:*:read`
-- `/auth/forgot-password` POST -> `public`
-- `/auth/reset-password` POST -> `public`
-- `/auth/verify-email` POST -> `public`
-- `/me/password` POST -> `self:password:*:change`
-
-## 17. Eventos
+## 16. Eventos
 
 Event Map:
 
@@ -1406,9 +1092,9 @@ Event Map:
 
 Eventos por modulo:
 
-- identity publica: `user.created`, `role.assigned`, `role.revoked`, `permission.assigned`, `permission.revoked`.
+- identity publica: `user.created`, `user.password_changed`, `user.email_verified`.
 - projects publica: `project.created`, `module.created`, `team.created`. Consume: `user.created`.
-- operations publica: `request.created`, `request.approved`, `request.rejected`, `request.executed`. Consume: `permission.assigned`, `role.assigned`, `project.created`, `module.created`.
+- operations publica: `request.created`, `request.approved`, `request.rejected`, `request.executed`. Consume: `project.created`, `module.created`.
 - audit publica: `audit.logged`. Consume: todos los eventos de negocio.
 
 Eventos minimos:
@@ -1417,10 +1103,6 @@ Eventos minimos:
 - `module.created`
 - `team.created`
 - `user.created`
-- `role.assigned`
-- `role.revoked`
-- `permission.assigned`
-- `permission.revoked`
 - `request.created`
 - `request.approved`
 - `request.rejected`
@@ -1433,17 +1115,13 @@ Payload minimo por evento:
 - `module.created`: `project_module_id`, `project_id`, `code`, `name`, `actor_id`, `created_at`
 - `team.created`: `team_id`, `project_id`, `name`, `actor_id`, `created_at`
 - `user.created`: `user_id`, `email`, `actor_id`, `created_at`
-- `role.assigned`: `user_id`, `project_id`, `project_role_id`, `valid_from`, `valid_until`, `actor_id`, `created_at`
-- `role.revoked`: `user_id`, `project_id`, `project_role_id`, `actor_id`, `created_at`
-- `permission.assigned`: `subject_type`, `subject_id`, `project_permission_id`, `scope`, `scope_id`, `valid_from`, `valid_until`, `actor_id`, `created_at`
-- `permission.revoked`: `subject_type`, `subject_id`, `project_permission_id`, `actor_id`, `created_at`
 - `request.created`: `request_id`, `project_id`, `environment_id`, `module_id`, `tool_id`, `created_by`, `created_at`
 - `request.approved`: `request_id`, `approved_by`, `comment`, `created_at`
 - `request.rejected`: `request_id`, `approved_by`, `comment`, `created_at`
 - `request.executed`: `request_id`, `executed_by`, `status`, `output_ref`, `created_at`
 - `audit.logged`: `audit_log_id`, `event_type`, `entity_type`, `entity_id`, `actor_id`, `created_at`
 
-## 18. Plan de Construccion (Semanal)
+## 17. Plan de Construccion (Semanal)
 
 Semana 1 - Esqueleto y setup
 
@@ -1458,9 +1136,8 @@ Semana 2 - Infra y Auth
 - JWT login, logout y refresh.
 - Verify email y reset password.
 
-Semana 3 - Seguridad y Core backend
+Semana 3 - Core backend
 
-- Access Control Matrix aplicada (guards por endpoint).
 - Self-service `/me` (JWT-only).
 - Modulos `identity`, `project`, `operations`, `audit`.
 - CRUD de proyectos, modulos, ambientes, equipos.
@@ -1470,7 +1147,7 @@ Semana 4 - Vertical slice y Backoffice
 - Crear solicitud, aprobar, ejecutar.
 - Auditoria y eventos.
 - UI basica para Requests, Approvals y Request Detail.
-- Admin: proyectos, equipos, roles y permissions, tools.
+- Admin: proyectos, equipos, usuarios, tools.
 
 Semana 5 - Hardening y QA
 
@@ -1479,7 +1156,7 @@ Semana 5 - Hardening y QA
 - Ajustes de performance y validaciones.
 - Release candidate.
 
-## 19. Convenciones
+## 18. Convenciones
 
 Estructura del repositorio:
 
@@ -1492,7 +1169,7 @@ Estructura del repositorio:
 Nombres:
 
 - Carpetas y archivos en `kebab-case`.
-- Casos de uso en `PascalCase` dentro de `## 11. Casos de Uso (FRD)` (Use Cases).
+- Casos de uso en `PascalCase` dentro de `## 10. Casos de Uso (FRD)` (Use Cases).
 - ADRs dentro de `docs/architecture.md` (seccion ADRs).
 - **Classes**: `PascalCase`, represent domain or application concepts.
 - **Files/Folders**: `kebab-case`, represent technical artifacts.
@@ -1510,9 +1187,9 @@ Database Naming
 
 - Database Schemas (por bounded context)
   - `identity`: identidad y acceso.
-  - `projects`: proyectos, m�dulos, entornos, equipos y roles.
+  - `projects`: proyectos, modulos, entornos y equipos.
   - `operations`: solicitudes, aprobaciones y ejecuciones.
-  - `audit`: auditor�a.
+  - `audit`: auditoria.
 
   Ejemplos:
   - `identity.user`
@@ -1520,7 +1197,6 @@ Database Naming
   - `projects.project_module`
   - `projects.project_environment`
   - `projects.team`
-  - `projects.project_role`
   - `audit.audit_log`
 
 Documentacion:
@@ -1528,11 +1204,11 @@ Documentacion:
 - Este documento es el indice maestro.
 - Vision y objetivos: ver Seccion 1.
 - Alcance y MVP: ver Seccion 3.
-- Dominio, permisos y datos: ver Secciones 4, 6, 7 y 8.
-- Requerimientos no funcionales: ver Seccion 10.
-- Casos de uso: ver Seccion 11.
-- Arquitectura y ADRs: ver Seccion 13.
-- API y matriz de acceso: ver Seccion 16.
+- Dominio y datos: ver Secciones 4, 6 y 7.
+- Requerimientos no funcionales: ver Seccion 9.
+- Casos de uso: ver Seccion 10.
+- Arquitectura y ADRs: ver Seccion 12.
+- API: ver Seccion 15.
 - Mantener fecha de actualizacion en la portada de este documento.
 
 CI:
@@ -1540,11 +1216,11 @@ CI:
 - CircleCI usa `scripts/ci.sh`.
 - El script debe ser idempotente y fallar solo ante errores reales.
 
-## 20. Glosario
+## 19. Glosario
 
 - Proyecto: iniciativa o producto gestionado.
 - Modulo: componente funcional dentro de un proyecto.
 - Entorno: instancia de despliegue (Dev, QA, Prod).
 - Equipo: grupo de personas responsables de uno o mas modulos.
-- Rol de proyecto: conjunto de permisos dentro de un proyecto.
+- Herramienta: utilidad operativa (SQL Runner, Deploy Runner).
 - Solicitud: peticion formal para ejecutar una accion.

@@ -1,12 +1,12 @@
-import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
-import { UserException } from '@identity/domain/user/errors/user.exception';
-import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
-import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
-import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
 import { ChangePasswordCommand } from '@identity/application/change-password/command/change-password.command';
 import { ChangePasswordPort } from '@identity/application/change-password/port/change-password.port';
 import { PasswordPolicyService } from '@identity/application/shared/password-policy/password-policy.service';
 import { PasswordHashingPort } from '@identity/application/shared/port/password-hashing.port';
+import { UserNotFoundException } from '@identity/domain/user/errors/user-not-found.exception';
+import { UserException } from '@identity/domain/user/errors/user.exception';
+import { UserRepositoryPort } from '@identity/domain/user/repository/user-repository.port';
+import { PasswordHash } from '@identity/domain/user/value-objects/password-hash.vo';
+import { UserId } from '@identity/domain/user/value-objects/user-id.vo';
 
 export class ChangePasswordUseCase implements ChangePasswordPort {
   constructor(
